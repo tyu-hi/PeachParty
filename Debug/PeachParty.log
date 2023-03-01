@@ -1,0 +1,11 @@
+﻿  Actor.cpp
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(315,1): error C2027: use of undefined type 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(9,7): message : see declaration of 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(319,1): error C2027: use of undefined type 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(9,7): message : see declaration of 'StudentWorld'
+  StudentWorld.cpp
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(315,1): error C2027: use of undefined type 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(9,7): message : see declaration of 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(319,1): error C2027: use of undefined type 'StudentWorld'
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.h(9,7): message : see declaration of 'StudentWorld'
+  Generating Code...
