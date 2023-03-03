@@ -616,6 +616,7 @@ void BankSquares::doSomething()
     if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
     {
         int deductedCoins = 0;
+        //check if player will go broke when deducting 5 coins
         if (getWorld()->getPlayerCoins(1) - 5 <= 0)
         {
             //std::cerr << "player is going broke" << std::endl;
@@ -679,14 +680,13 @@ void BankSquares::doSomething()
     {
         if (!getYoshiOn())
         {
-            std::cerr << "Yoshi coins: " << getWorld()->getPlayerCoins(2) << std::endl;
-            std::cerr << "before yoshi deducted bank: " << getWorld()->getBankCoins() << std::endl;
+            //std::cerr << "Yoshi coins: " << getWorld()->getPlayerCoins(2) << std::endl;
+            //std::cerr << "before yoshi deducted bank: " << getWorld()->getBankCoins() << std::endl;
             //Deduct from bank, add to player
             getWorld()->addPlayerCoins(2, getWorld()->getBankCoins());
             getWorld()->changeBankCoins(2, getWorld()->getBankCoins());
-            //std::cerr << "deducted bank: " << getWorld()->getBankCoins() << std::endl;
-            std::cerr << "Yoshi new coins: " << getWorld()->getPlayerCoins(2) << std::endl;
-            std::cerr << "after yoshi stole bank: " << getWorld()->getBankCoins() << std::endl;
+            //std::cerr << "Yoshi new coins: " << getWorld()->getPlayerCoins(2) << std::endl;
+            //std::cerr << "after yoshi stole bank: " << getWorld()->getBankCoins() << std::endl;
             getWorld()->playSound(SOUND_WITHDRAW_BANK);
         }
         setYoshiOn(true);
@@ -694,5 +694,105 @@ void BankSquares::doSomething()
     else
     {
         setYoshiOn(false);
+    }
+}
+//reusing code?
+//maybe create another function that is called in dosometing, that recerives player number
+
+
+EventSquares::EventSquares(StudentWorld* world, int startX, int startY)
+    :Squares(world, IID_EVENT_SQUARE, startX, startY, 0, 1)
+{
+
+}
+void EventSquares::doSomething()
+{
+    int peachX, peachY, yoshiX, yoshiY;
+    int randomAction = randInt(1, 3);
+    if (getWorld()->getPlayerWaitingToRoll(1) == true)
+    {
+        if (isOverlappingPeach(peachX, peachY, getX(), getY()))
+        {
+            //option 1: teleported to random spot on board
+            
+            //option 2: swap position and movement state with another player.
+            //option 3: give player a vortex projectile
+        }
+
+    }
+   
+}
+
+DroppingSquares::DroppingSquares(StudentWorld* world, int startX, int startY)
+    :Squares(world, IID_DROPPING_SQUARE, startX, startY, 0, 1)
+{   }
+//Bowser creates this dropping square, and passes in the x and y when constructing this.
+void DroppingSquares::doSomething()
+{
+    int randomAction = randInt(1, 2);
+    int peachX, peachY, yoshiX, yoshiY;
+    //Peach
+    if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    {
+        if (randomAction == 1)
+        {
+            //option 1: deduct 10 coins
+            if (getWorld()->getPlayerCoins(1) - 10 <= 0)
+            {
+                //std::cerr << "player is going broke" << std::endl;
+                getWorld()->deductPlayerCoins(1, getWorld()->getPlayerCoins(1));
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+            else
+            {
+                getWorld()->deductPlayerCoins(1, 10);
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+        }
+        else
+        {
+            if (getWorld()->getPlayerStars(1) - 10 <= 0)
+            {
+                getWorld()->deductPlayerStars(1, getWorld()->getPlayerStars(1));
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+            else
+            {
+                getWorld()->deductPlayerStars(1, 1);
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+        }
+    }
+
+    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    {
+        if (randomAction == 1)
+        {
+            //option 1: deduct 10 coins
+            if (getWorld()->getPlayerCoins(2) - 10 <= 0)
+            {
+                //std::cerr << "player is going broke" << std::endl;
+                getWorld()->deductPlayerCoins(2, getWorld()->getPlayerCoins(2));
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+            else
+            {
+                getWorld()->deductPlayerCoins(2, 10);
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+        }
+        else
+        {
+            if (getWorld()->getPlayerStars(2) - 10 <= 0)
+            {
+                getWorld()->deductPlayerStars(2, getWorld()->getPlayerStars(2));
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+            else
+            {
+                getWorld()->deductPlayerStars(2, 1);
+                getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
+            }
+        }
     }
 }

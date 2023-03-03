@@ -7,6 +7,8 @@
 
 //reference STudentWorld
 class StudentWorld;
+class GameObject;
+#include <vector>
 
 //Peach, Yoshi, Coin Square, Star Squares, Directional Squares, Bank Squares
 //Event Squares, Dropping Squares, Boo, Bowser, Vortexes
@@ -101,7 +103,10 @@ public:
 	{
 		m_playerStars += stars;
 	}
-
+	void deductStars(int stars)
+	{
+		m_playerStars -= stars;
+	}
 	//Ticks
 	int getTicks()
 	{
@@ -325,27 +330,25 @@ public:
 class EventSquares : public Squares
 {
 	public:
-		EventSquares(StudentWorld* world, int startX, int startY)
-			:Squares(world, IID_EVENT_SQUARE, startX, startY, 0, 1)
-		{
-
-		}
-		virtual void doSomething() {};
+		EventSquares(StudentWorld* world, int startX, int startY);
+		virtual void doSomething();
 };
 class DroppingSquares : public Squares
 {
 public:
-	DroppingSquares(StudentWorld* world, int startX, int startY)
-		:Squares(world, IID_DROPPING_SQUARE, startX, startY, 0, 1)
-	{
-
-	}
-	virtual void doSomething() {};
+	DroppingSquares(StudentWorld* world, int startX, int startY);
+	virtual void doSomething();
 
 };
 
-class Vortexes : public Actor
+class Vortex : public Actor
 {
+public:
+	Vortex(StudentWorld* world, const int imageID, int startX, int startY, int directionAtatck);
+	std::vector<Actor*> activate();
+	void doSomething();
+	
+private:
 
 };
 

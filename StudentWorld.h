@@ -69,7 +69,7 @@ public:
           return m_yoshi->getCoins();
       }
   }
-  //Add coins
+  //Add stars
   void addPlayerStars(int player_num, int stars)
   {
       if (player_num == 1)
@@ -79,6 +79,28 @@ public:
       else
       {
           m_yoshi->addStars(stars);
+      }
+  }
+  void deductPlayerStars(int player_num, int stars)
+  {
+      if (player_num == 1)
+      {
+          m_peach->deductStars(stars);
+      }
+      else
+      {
+          m_yoshi->deductStars(stars);
+      }
+  }
+  int getPlayerStars(int player_num)
+  {
+      if (player_num == 1)
+      {
+          return m_peach->getStars();
+      }
+      else
+      {
+          m_yoshi->getStars();
       }
   }
 

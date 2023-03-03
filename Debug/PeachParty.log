@@ -1,4 +1,7 @@
 ﻿  Actor.cpp
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.cpp(710,33): warning C4101: 'yoshiY': unreferenced local variable
+C:\Users\gongt\Desktop\PeachParty\PeachParty\Actor.cpp(710,25): warning C4101: 'yoshiX': unreferenced local variable
   StudentWorld.cpp
   Generating Code...
+C:\Users\gongt\Desktop\PeachParty\PeachParty\StudentWorld.h(105): warning C4715: 'StudentWorld::getPlayerStars': not all control paths return a value
   PeachParty.vcxproj -> C:\Users\gongt\Desktop\PeachParty\Debug\PeachParty.exe
