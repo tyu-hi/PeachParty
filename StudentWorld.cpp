@@ -23,6 +23,7 @@ StudentWorld::StudentWorld(string assetPath)
     /*m_peach = nullptr;
     m_yoshi = nullptr;*/
 
+
     //actor.clear();
 }
 //
@@ -177,8 +178,8 @@ int StudentWorld::init()
                 }
                
                 }
-        }
             }
+        }
     }
    
     startCountdownTimer(99);
@@ -212,7 +213,7 @@ int StudentWorld::move()
     statsBoard  << "P1 Roll: " << m_peach->getDieRoll() << " Stars: " << m_peach->getStars() << " $$: " << m_peach->getCoins() 
                 << " VOR"
                 << " | Time: " << timeRemaining()
-                << " | Bank: " << " | "
+                << " | Bank: " << getBankCoins() << " | "
                 << "P2 Roll: " << m_yoshi->getDieRoll() << " Stars: " << m_yoshi->getStars() << " $$: " << m_yoshi->getCoins() 
                 << " VOR";     //check if there is VOR!!!!!!
 

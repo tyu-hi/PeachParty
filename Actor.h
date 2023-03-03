@@ -281,8 +281,8 @@ class Squares :public Actor
 {
 public:
 	Squares(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth);
-	bool isOverlappinggPeach(int& peachX, int& peachY, int objectX, int objectY);
-	bool isOverLappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY);
+	bool isOverlappingPeach(int& peachX, int& peachY, int objectX, int objectY);
+	bool isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY);
 	void setPeachOn(bool state);
 	bool getPeachOn();
 	void setYoshiOn(bool state);
@@ -314,16 +314,13 @@ private:
 
 };
 
-
 class BankSquares : public Squares
 {
 public:
-	BankSquares(StudentWorld* world, int startX, int startY)
-		:Squares(world, IID_BANK_SQUARE, startX, startY, 0, 1)
-	{
+	BankSquares(StudentWorld* world, int startX, int startY);
+	virtual void doSomething();
 
-	}
-	virtual void doSomething() {};
+
 };
 class EventSquares : public Squares
 {
@@ -346,6 +343,7 @@ public:
 	virtual void doSomething() {};
 
 };
+
 class Vortexes : public Actor
 {
 

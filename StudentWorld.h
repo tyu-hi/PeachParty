@@ -37,7 +37,7 @@ public:
   void findPeach(/*Actor* player, */int& playerX, int& playerY);
   void findPlayer(int player_num, int& playerX, int& playerY);
   void findYoshi(/*Actor* player, */int& playerX, int& playerY);
-  //PeachCoins
+  //Player Coins
   void deductPlayerCoins(int player_num, int coins)
   {
       if (player_num == 1)
@@ -69,6 +69,7 @@ public:
           return m_yoshi->getCoins();
       }
   }
+  //Add coins
   void addPlayerStars(int player_num, int stars)
   {
       if (player_num == 1)
@@ -104,7 +105,7 @@ public:
           return m_yoshi->setWaitingToRoll(value);
       }
   }
-  //Direction of Player
+  //Moving Direction of Player
   int getPlayerDirection(int player_num)
   {
       if (player_num == 1)
@@ -127,6 +128,18 @@ public:
           m_yoshi->setMovingDirection(dir);
       }
   }
+  //Sprite Direction of Player
+  void setSpriteDirection(int player_num, int dir)
+  {
+      if (player_num == 1)
+      {
+          m_peach->setDirection(dir);
+      }
+      else
+      {
+          m_yoshi->setDirection(dir);
+      }
+  }
 
   //Destructor
   virtual ~StudentWorld()
@@ -147,7 +160,25 @@ public:
       }
       return getActors;
   }*/
-
+  void changeBankCoins(int change, int coins)
+  {
+      if (change == 1)
+      {
+          m_bankCoins += coins;
+      }
+      else
+      {
+          m_bankCoins -= coins;
+      }
+  }
+  int getBankCoins()
+  {
+      if (m_bankCoins <= 0)
+      {
+          m_bankCoins = 0;
+      }
+      return m_bankCoins;
+  }
 
 private:
    //It is required that you keep track of all of the actor
@@ -155,6 +186,8 @@ private:
    //using a container of pointers to the actors.
     std::list<Actor*> actor;
     
+    //Bank Coins
+    int m_bankCoins;
     
     //create seperate pointers for peach and yoshi
     Peach* m_peach;
