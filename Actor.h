@@ -307,10 +307,7 @@ public:
 		return direction;
 		//1 == up, 2 == right, 3 == down, 4 == left
 	}
-	void forceDirection(int player, int goDir)
-	{
-		getWorld()->setPlayerDirection(player, goDir);
-	}
+	void forceDirection(int playerNum, int goDir);
 	virtual void doSomething();
 private:
 	int direction;

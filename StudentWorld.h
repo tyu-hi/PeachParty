@@ -35,6 +35,7 @@ public:
   bool isEmpty(int dir, int chkX, int chkY);
 
   void findPeach(/*Actor* player, */int& playerX, int& playerY);
+  void findPlayer(int player_num, int& playerX, int& playerY);
   void findYoshi(/*Actor* player, */int& playerX, int& playerY);
   //PeachCoins
   void deductPlayerCoins(int player_num, int coins)

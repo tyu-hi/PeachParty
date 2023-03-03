@@ -14,6 +14,8 @@ GameWorld* createStudentWorld(string assetPath)
 
 // Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
 
+// HI ty
+
 StudentWorld::StudentWorld(string assetPath)
     : GameWorld(assetPath), m_peachCoins(0), m_yoshiCoins(0)
 {
@@ -330,6 +332,19 @@ void StudentWorld::findPeach(/*Actor* player, */int& playerX, int& playerY)
     //    Actor* temp;
     //    if (temp->isPlayer() &&)
     //}
+}
+void StudentWorld::findPlayer(int player_num, int& playerX, int& playerY)
+{
+    if (player_num == 1)
+    {
+        playerX = m_peach->getX();
+        playerY = m_peach->getY();
+    }
+    else
+    {
+        playerX = m_yoshi->getX();
+        playerY = m_yoshi->getY();
+    }
 }
 void StudentWorld::findYoshi(/*Actor* player, */int& playerX, int& playerY)
 {

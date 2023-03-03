@@ -308,7 +308,7 @@ Squares::Squares(StudentWorld* world, const int imageID, int startX, int startY,
 }
 bool Squares::isOverlappinggPeach(int& peachX, int& peachY, int objectX, int objectY)
 {
-    getWorld()->findPeach(peachX, peachY);
+    getWorld()->findPlayer(1, peachX, peachY);
     if (peachX == objectX && peachY == objectY)
     {
         return true;
@@ -320,7 +320,7 @@ bool Squares::isOverlappinggPeach(int& peachX, int& peachY, int objectX, int obj
 }
 bool Squares::isOverLappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY)
 {
-    getWorld()->findPeach(yoshiX, yoshiY);
+    getWorld()->findYoshi(yoshiX, yoshiY);
     if (yoshiX == objectX && yoshiY == objectY)
     {
         return true;
@@ -477,6 +477,7 @@ void CoinSquare::getBlueSquare()
 StarSquare::StarSquare(StudentWorld* world, int startX, int startY)
     : Squares(world, IID_STAR_SQUARE, startX, startY, 0, 1)
 {   }
+
 void StarSquare::doSomething()
 {
     //Checking Peach
@@ -533,6 +534,18 @@ DirectionalSquares::DirectionalSquares(StudentWorld* world, int startX, int star
 {
     direction = 0;
 }
+void DirectionalSquares::forceDirection(int playerNum, int goDir)
+{
+    if (playerNum == 1)
+    {
+        getWorld()->setPlayerDirection(playerNum, goDir);
+
+    }
+    else
+    {
+        getWorld()->setPlayerDirection(playerNum, goDir);
+    }
+}
 void DirectionalSquares::doSomething()
 {
     //
@@ -553,7 +566,31 @@ void DirectionalSquares::doSomething()
             break;
         case 4: //left
             forceDirection(1, 180);
-        defualt:
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (isOverLappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    {
+
+        //std::cerr << "yoshi check";
+        switch (theDirection)
+        {
+        case 1: //up
+            forceDirection(2, 90);
+            break;
+        case 2: //right
+            forceDirection(2, 0);
+            break;
+        case 3: //down
+            forceDirection(2, 270);
+            break;
+        case 4: //left
+            forceDirection(2, 180);
+            break;
+        default:
             break;
         }
     }
