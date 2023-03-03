@@ -477,7 +477,6 @@ void CoinSquare::getBlueSquare()
 StarSquare::StarSquare(StudentWorld* world, int startX, int startY)
     : Squares(world, IID_STAR_SQUARE, startX, startY, 0, 1)
 {   }
-
 void StarSquare::doSomething()
 {
     //Checking Peach
@@ -547,61 +546,61 @@ void DirectionalSquares::forceDirection(int playerNum, int goDir)
     }
 }
 void DirectionalSquares::doSomething()
-{
-//
-int theDirection = getDirectionSquare();
-int peachX, peachY, yoshiX, yoshiY;
-if (isOverlappingPeach(peachX, peachY, getX(), getY()))
-{
-    switch (theDirection)
     {
-    case 1: //up
-        forceDirection(1, 90);
-        getWorld()->setSpriteDirection(1, 0);
-        break;
-    case 2: //right
-        forceDirection(1, 0);
-        getWorld()->setSpriteDirection(1, 0);
-        break;
-    case 3: //down
-        forceDirection(1, 270);
-        getWorld()->setSpriteDirection(1, 0);
-        break;
-    case 4: //left
-        forceDirection(1, 180);
-        getWorld()->setSpriteDirection(1, 180);
-        break;
-    default:
-        break;
-    }
-}
-
-if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
-{
-
-    //std::cerr << "yoshi check";
-    switch (theDirection)
+    //
+    int theDirection = getDirectionSquare();
+    int peachX, peachY, yoshiX, yoshiY;
+    if (isOverlappingPeach(peachX, peachY, getX(), getY()))
     {
-    case 1: //up
-        forceDirection(2, 90);
-        getWorld()->setSpriteDirection(2, 0);
-        break;
-    case 2: //right
-        forceDirection(2, 0);
-        getWorld()->setSpriteDirection(2, 0);
-        break;
-    case 3: //down
-        forceDirection(2, 270);
-        getWorld()->setSpriteDirection(2, 0);
-        break;
-    case 4: //left
-        forceDirection(2, 180);
-        getWorld()->setSpriteDirection(2, 180);
-        break;
-    default:
-        break;
+        switch (theDirection)
+        {
+        case 1: //up
+            forceDirection(1, 90);
+            getWorld()->setSpriteDirection(1, 0);
+            break;
+        case 2: //right
+            forceDirection(1, 0);
+            getWorld()->setSpriteDirection(1, 0);
+            break;
+        case 3: //down
+            forceDirection(1, 270);
+            getWorld()->setSpriteDirection(1, 0);
+            break;
+        case 4: //left
+            forceDirection(1, 180);
+            getWorld()->setSpriteDirection(1, 180);
+            break;
+        default:
+            break;
+        }
     }
-}
+
+    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    {
+
+        //std::cerr << "yoshi check";
+        switch (theDirection)
+        {
+        case 1: //up
+            forceDirection(2, 90);
+            getWorld()->setSpriteDirection(2, 0);
+            break;
+        case 2: //right
+            forceDirection(2, 0);
+            getWorld()->setSpriteDirection(2, 0);
+            break;
+        case 3: //down
+            forceDirection(2, 270);
+            getWorld()->setSpriteDirection(2, 0);
+            break;
+        case 4: //left
+            forceDirection(2, 180);
+            getWorld()->setSpriteDirection(2, 180);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 BankSquares::BankSquares(StudentWorld* world, int startX, int startY)
@@ -638,12 +637,19 @@ void BankSquares::doSomething()
     }
     else if (isOverlappingPeach(peachX, peachY, getX(), getY()))
     {
-
-        //std::cerr << "before deducted bank: " << getWorld()->getBankCoins() << std::endl;
-        getWorld()->addPlayerCoins(1, getWorld()->getBankCoins());
-        getWorld()->changeBankCoins(2, getWorld()->getBankCoins());
-        //std::cerr << "deducted bank: " << getWorld()->getBankCoins() << std::endl;
-        getWorld()->playSound(SOUND_WITHDRAW_BANK);
+        if (!getPeachOn())
+        {
+            //std::cerr << "before deducted bank: " << getWorld()->getBankCoins() << std::endl;
+            getWorld()->addPlayerCoins(1, getWorld()->getBankCoins());
+            getWorld()->changeBankCoins(2, getWorld()->getBankCoins());
+            //std::cerr << "deducted bank: " << getWorld()->getBankCoins() << std::endl;
+            getWorld()->playSound(SOUND_WITHDRAW_BANK);
+        }
+        setPeachOn(true);
+    }
+    else
+    {
+        setPeachOn(false);
     }
 
     //Yoshi
@@ -671,12 +677,22 @@ void BankSquares::doSomething()
     }
     else if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
     {
-        //std::cerr << "before yoshi deducted bank: " << getWorld()->getBankCoins() << std::endl;
-        //Deduct from bank, add to player
-        getWorld()->addPlayerCoins(2, getWorld()->getBankCoins());
-        getWorld()->changeBankCoins(2, getWorld()->getBankCoins());
-
-        //std::cerr << "deducted bank: " << getWorld()->getBankCoins() << std::endl;
-        getWorld()->playSound(SOUND_WITHDRAW_BANK);
+        if (!getYoshiOn())
+        {
+            std::cerr << "Yoshi coins: " << getWorld()->getPlayerCoins(2) << std::endl;
+            std::cerr << "before yoshi deducted bank: " << getWorld()->getBankCoins() << std::endl;
+            //Deduct from bank, add to player
+            getWorld()->addPlayerCoins(2, getWorld()->getBankCoins());
+            getWorld()->changeBankCoins(2, getWorld()->getBankCoins());
+            //std::cerr << "deducted bank: " << getWorld()->getBankCoins() << std::endl;
+            std::cerr << "Yoshi new coins: " << getWorld()->getPlayerCoins(2) << std::endl;
+            std::cerr << "after yoshi stole bank: " << getWorld()->getBankCoins() << std::endl;
+            getWorld()->playSound(SOUND_WITHDRAW_BANK);
+        }
+        setYoshiOn(true);
+    }
+    else
+    {
+        setYoshiOn(false);
     }
 }

@@ -55,7 +55,7 @@ public:
       }
       else
       {
-          m_yoshi->addCoins(3);
+          m_yoshi->addCoins(coins);
       }
   }
   int getPlayerCoins(int player_num)
