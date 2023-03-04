@@ -7,7 +7,7 @@
 //Actor
 Actor::Actor(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth, double size)
     : GraphObject(imageID, startX, startY, startDirection, depth, 1), m_dieRoll(0), ticks_to_move(0), waiting_to_roll(true)
-        , m_alive(true), m_playerCoins(0), m_playerStars(0)//, ticks_to_move(ticks)
+        , m_alive(true), m_playerCoins(0), m_playerStars(0), m_goTeleport(false), justSwapped(false) //, ticks_to_move(ticks)
 {
     m_world = world;
 }
@@ -25,7 +25,7 @@ bool Actor::isValidPos(int dir) //, int xDir, int yDir)
     //std::cerr << xNew << " " << yNew << std::endl;
 
     //pass in grid x, y for isEmpty()
-    if (m_world->isEmpty(dir, xNew / SPRITE_WIDTH, yNew / SPRITE_HEIGHT) == true)	
+    if (m_world->isEmpty(xNew / SPRITE_WIDTH, yNew / SPRITE_HEIGHT) == true)	
     {
         //std::cerr << "Next pos is empty, valid pos is false" << std::endl;
         //if it's empty, then you can't keep moving.  Meaning, false valid position
@@ -36,12 +36,90 @@ bool Actor::isValidPos(int dir) //, int xDir, int yDir)
         //std::cerr << "Next pos is not empty, valid pos is true " << std::endl;
         return true;
     }
+
 }
+void Actor::swap()
+{
+    //swap position (x, y)
+    //int peachX, peachY, yoshiX, yoshiY;
+    //getWorld()->findPeach(peachX, peachY);
+    //getWorld()->findYoshi(yoshiX, yoshiY);
+    //getWorld()->movePlayer(1, yoshiX, yoshiY);
+    //getWorld()->movePlayer(2, peachX, peachY);
+  
+
+    //get coins getx gety to make it dropping squares' getx gety before destryoing coin
+    //getWorld()->movePlayer(2, peachX, peachY);
+    int peachX = getWorld()->getPeach()->getX();
+    int peachY = getWorld()->getPeach()->getY();
+    int yoshiX = getWorld()->getYoshi()->getX();
+    int yoshiY = getWorld()->getYoshi()->getY();
+    getWorld()->getPeach()->moveTo(yoshiX, yoshiY);
+    getWorld()->getYoshi()->moveTo(peachX, peachY);
+    //Avatar* peach = getWorld()->getpeach()
+    //return m_plaer
+    //swap ticks
+    int tempTicks = getWorld()->getPlayerTicks(1);
+    getWorld()->changePlayerTicks(1, getWorld()->getPlayerTicks(2));
+    getWorld()->changePlayerTicks(2, tempTicks);
+    //swap moving direction
+    int movingDir = getWorld()->getPlayerDirection(1);
+    getWorld()->setPlayerDirection(1, getWorld()->getPlayerDirection(2));
+    getWorld()->setPlayerDirection(2, movingDir);
+    //swap sprite direction
+    int spriteDir = getWorld()->getSpriteDirection(1);
+    getWorld()->setSpriteDirection(1, getWorld()->getSpriteDirection(2));
+    getWorld()->setSpriteDirection(2, spriteDir);
+    //swap state
+    bool rollState = getWorld()->getPlayerWaitingToRoll(1);
+    getWorld()->setPlayerWaitingToRoll(1, getWorld()->getPlayerWaitingToRoll(2));
+    getWorld()->setPlayerWaitingToRoll(2, rollState);
+    //swap:
+        /*
+        i. x, y coordinates
+        ii.the number of ticks left that the player has to move before
+        completing their roll
+        iii.the player's walk direction
+        iv.the player's sprite direction
+        v.the player's roll/walk state*/
+ 
+}
+//void Actor::swapPosition()
+//{
+//
+//}
+void Actor::swapStars()
+{
+    //swap stars
+    int tempStars = 0;
+    tempStars = getWorld()->getPlayerStars(1);
+    getWorld()->setPlayerStars(1, getWorld()->getPlayerStars(2));
+    getWorld()->setPlayerStars(2, tempStars);
+}
+void Actor::swapCoins()
+{
+    //swap coins
+    int tempCoins = 0;
+    tempCoins = getWorld()->getPlayerCoins(1);
+    getWorld()->setPlayerCoins(1, getWorld()->getPlayerCoins(2));
+    getWorld()->setPlayerCoins(2, tempCoins);
+}
+
+/*
+void Actor::setTeleportStatus(bool teleportStatus)
+{
+    m_goTeleport = teleportStatus;
+}
+bool Actor::getTeleportStatus()
+{
+    return m_goTeleport;
+}*/
+
 
 Players::Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks) 
 //, int startDirection, int depth, double size)
     : Actor(world, imageID, startX, startY)// startDirection, depth, size),
-    , /*ticks_to_move(ticks)*/ movingDirection(right)
+    , /*ticks_to_move(ticks)*/ movingDirection(right) //, m_vortex(nullptr)
 {
     //ticks_to_move = 0;
     //waiting_to_roll = true;
@@ -49,38 +127,6 @@ Players::Players(StudentWorld* world, const int imageID, int startX, int startY,
     //m_dieRoll = 0;
     //movingDirection = right;
 }
-//bool Players::getWaitingToRoll()
-//{
-//    return waiting_to_roll;
-//}
-
-//int Players::getTicks()
-//{
-//    //std::cerr << "ticks: " << ticks_to_move << std::endl;
-//    return ticks_to_move;
-//}
-//void Players::setTicks(int dieRoll)
-//{
-//    if (dieRoll > 0)
-//    {
-//        ticks_to_move = dieRoll * 8;
-//        //std::cerr << "new ticks: " << ticks_to_move << std::endl;
-//        //return ticks_to_move;
-//    }
-//    else if (dieRoll == 0 && ticks_to_move > 0)
-//    {
-//        //std::cerr << "new decremented ticks: " << ticks_to_move << std::endl;
-//        ticks_to_move--;
-//    }
-//    else
-//    {
-//        ticks_to_move = 0;
-//    }
-//}
-//void Players::setWaitingToRoll(bool value)
-//{
-//    waiting_to_roll = value;
-//}
 int Players::getMovingDirection()
 {
     return movingDirection;
@@ -89,6 +135,12 @@ void Players::setMovingDirection(int dir)
 {
     movingDirection = dir;
 }
+
+//void Players::setVortex(Vortex* vortex)
+//{
+//    //m_vortex = vortex;
+//}
+
 void Players::doSomething()
 {
     if (getWaitingToRoll() == false)	//since waiting to roll is false, walking state is active
@@ -229,6 +281,12 @@ void Peach::doSomething()
             break;
 
         case ACTION_FIRE:
+            //if (m_vortex == nullptr)
+            //vortex = new vortex(this, getX, getY)
+            
+            ///Vortex* newVortex = new Vortex(this, getX(), getY());
+            //getworld() -> add actor() ??
+            break;
 
         default:
             return;	//nothing pressed, return?
@@ -237,6 +295,7 @@ void Peach::doSomething()
     
     //Allows you to exeucte code from derived class
     Players::doSomething();
+    getWorld()->getPeach()->setJustSwappedStatus(false);
 
     //KeyMap
     /*{ 'a', { 1, ACTION_LEFT } },
@@ -251,6 +310,8 @@ void Peach::doSomething()
     { KEY_PRESS_DOWN,  { 2, ACTION_DOWN } },
     { KEY_PRESS_ENTER, { 2, ACTION_ROLL } },
     { '\\',            { 2, ACTION_FIRE } },*/
+    
+    //if teleport flag is true, set player's flag in event square, teleport
 }
 
 Yoshi::Yoshi(StudentWorld* world, int startX, int startY)
@@ -298,6 +359,8 @@ void Yoshi::doSomething()
         }
     }
     Players::doSomething();
+    //getWorld()->getYoshi()->setJustSwappedStatus(false);
+
 }
 
 Squares::Squares(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth)
@@ -318,6 +381,17 @@ bool Squares::isOverlappingPeach(int& peachX, int& peachY, int objectX, int obje
         return false;
     }
 }
+//actor a actor b
+//check overlap for vortex
+//overlap(Actor* a, Actor* b){
+ //if getxa==getxb && getya!=getyb
+    //or/and? opposite
+
+    //calling in another function
+    //overlap(this, getPeach())     //"this" would be the class
+    //a->getX();
+//if callign this in vortex: this, bowser?
+
 bool Squares::isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY)
 {
     getWorld()->findYoshi(yoshiX, yoshiY);
@@ -329,6 +403,10 @@ bool Squares::isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int obje
     {
         return false;
     }
+}
+bool Squares::getIsImpactable()
+{
+    return false;
 }
 void Squares::setPeachOn(bool state)
 {
@@ -520,6 +598,7 @@ void StarSquare::doSomething()
 
             }
         }
+        setYoshiOn(true);
     }
     else
     {
@@ -636,7 +715,7 @@ void BankSquares::doSomething()
             getWorld()->playSound(SOUND_DEPOSIT_BANK);
         }
     }
-    else if (isOverlappingPeach(peachX, peachY, getX(), getY()))
+    else if (isOverlappingPeach(peachX, peachY, getX(), getY()))    //player landed on
     {
         if (!getPeachOn())
         {
@@ -707,20 +786,77 @@ EventSquares::EventSquares(StudentWorld* world, int startX, int startY)
 }
 void EventSquares::doSomething()
 {
-    int peachX, peachY, yoshiX, yoshiY;
-    int randomAction = randInt(1, 3);
-    if (getWorld()->getPlayerWaitingToRoll(1) == true)
-    {
-        if (isOverlappingPeach(peachX, peachY, getX(), getY()))
-        {
-            //option 1: teleported to random spot on board
-            
-            //option 2: swap position and movement state with another player.
-            //option 3: give player a vortex projectile
-        }
+    //int randomAction = randInt(1, 2);
 
+    int randomAction = 2;
+    int peachX, peachY, yoshiX, yoshiY;
+    if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == true)
+    {
+        
+        if (!getPeachOn() && getWorld()->getPeach()->getJustSwapped() == false)
+        {
+            std::cerr << "in event: " << std::endl;
+            //int randomAction = randInt(1, 1);
+            std::cerr << randomAction << std::endl;
+                //option 1: teleported to random spot on board
+            if (randomAction == 1)
+            {
+                std::cerr << "teleport " << std::endl;
+                //getWorld()->setTeleport(1, true);
+                getWorld()->teleportPlayer(1);
+                getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+            }
+            if (randomAction == 2)
+            {
+                std::cerr << "swap" << std::endl;
+                swap();
+            }
+            if (randomAction == 3)
+            {
+
+            }
+        }
+        setPeachOn(true);
+        getWorld()->getPeach()->setJustSwappedStatus(true);
     }
-   
+    else
+    {
+        getWorld()->getPeach()->setJustSwappedStatus(false);
+        setPeachOn(false);
+    }
+    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(2) == true)
+    {
+        if (!getYoshiOn() && getWorld()->getYoshi()->getJustSwapped() == false)
+        {
+            if (randomAction == 1)
+            {
+                std::cerr << "teleport yoshi" << std::endl;
+                //getWorld()->setTeleport(1, true);
+                getWorld()->teleportPlayer(2);
+                getWorld()->playSound(SOUND_PLAYER_TELEPORT);
+            }
+            if (randomAction == 2)
+            {
+                swap();
+                std::cerr << "swap " << std::endl;
+            }
+            if (randomAction == 3)
+            {
+
+            }
+        }
+        
+        setYoshiOn(true);
+        getWorld()->getYoshi()->setJustSwappedStatus(true);
+    }
+    else
+    {
+        setYoshiOn(false);
+        getWorld()->getYoshi()->setJustSwappedStatus(false);
+    }
+
+    //option 2: swap position and movement state with another player.
+    //option 3: give player a vortex projectile
 }
 
 DroppingSquares::DroppingSquares(StudentWorld* world, int startX, int startY)
@@ -795,4 +931,21 @@ void DroppingSquares::doSomething()
             }
         }
     }
+}
+
+
+Vortex::Vortex(StudentWorld* world, int startX, int startY)
+    :Actor(world, IID_VORTEX, startX, startY, 0, 0)
+{
+    //starts out in active state?
+    activeState = true;
+}
+//vector<Actor*> Vortex::activate();
+bool Vortex::isActiveState()
+{
+    return activeState;
+}
+void Vortex::doSomething()
+{
+
 }

@@ -68,6 +68,20 @@ public:
 	//	return m_playerCoins;
 	//}
 
+	//Swap player info
+	void swap();
+	void swapStars();
+	void swapCoins();
+
+	//Impactable for nonsquares
+	virtual bool getIsImpactable()
+	{
+		return true;
+	}
+	void setIsImpactable(bool state)
+	{
+		m_impactable = state;
+	}
 	//Coins
 	void addCoins(int coins)
 	{
@@ -85,7 +99,7 @@ public:
 		}
 		return m_playerCoins;
 	}
-	int setCoins(int coins)
+	void setCoins(int coins)
 	{
 		m_playerCoins = coins;
 	}
@@ -107,10 +121,18 @@ public:
 	{
 		m_playerStars -= stars;
 	}
+	void setStars(int stars)
+	{
+		m_playerStars = stars;
+	}
 	//Ticks
 	int getTicks()
 	{
 		return ticks_to_move;
+	}
+	void setPlayerTicks(int ticks)
+	{
+		ticks_to_move = ticks;
 	}
 	void setTicks(int dieRoll)
 	{
@@ -168,7 +190,20 @@ public:
 		//std::cerr << m_dieRoll << std::endl;
 		return m_dieRoll;
 	}
+	bool getJustSwapped()
+	{
+		return justSwapped;
+	}
+	void setJustSwappedStatus(bool state)
+	{
+		justSwapped = state;
+	}
 
+	//int getLocation();
+	//void setLocation(int xNew, int yNew);
+
+	/*void setTeleportStatus(bool teleportStatus);
+	bool getTeleportStatus();*/
 
 	//Pointer to StudentWorld
 	StudentWorld* getWorld();
@@ -186,6 +221,15 @@ private:
 
 	int m_playerCoins;
 	int m_playerStars;
+
+	int m_objectX;
+	int m_objectY;
+
+	bool m_goTeleport;
+
+	bool m_impactable;
+
+	bool justSwapped;
 };
 
 
@@ -195,13 +239,21 @@ class Players : public Actor
 public:
 	Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks);
 
-	virtual int getMovingDirection();
-	virtual void setMovingDirection(int dir);
+	int getMovingDirection();
+	void setMovingDirection(int dir);
 
+	void setNewLocationX(int newX);
+	void setNewLocationY(int newY);
+	
 	virtual void doSomething();
 	
+	/*void shouldTeleport(bool teleportStatus);
+	bool getTeleportStatus();*/
+	//void setVortex(Vortex* vortex);
 private:
 	int movingDirection; //right = 0 from graphobject
+	//Vortex* m_vortex;
+	//bool goTeleport;
 	
 };
 
@@ -270,6 +322,10 @@ public:
 	{
 		return color;
 	}
+	virtual bool getIsImpactable()
+	{
+		return false;
+	}
 	virtual void deactivate();
 	virtual void activate();
 	void getBlueSquare();
@@ -292,6 +348,7 @@ public:
 	bool getPeachOn();
 	void setYoshiOn(bool state);
 	bool getYoshiOn();
+	virtual bool getIsImpactable();
 private:
 	bool isPeachOnSquare;
 	bool isYoshiOnSquare;
@@ -344,11 +401,14 @@ public:
 class Vortex : public Actor
 {
 public:
-	Vortex(StudentWorld* world, const int imageID, int startX, int startY, int directionAtatck);
-	std::vector<Actor*> activate();
+	Vortex(StudentWorld* world, int startX, int startY); //, int directionAtatck);
+	//std::vector<Actor*> activate();
+	bool isActiveState();
 	void doSomething();
 	
 private:
+	bool activeState;
+
 
 };
 

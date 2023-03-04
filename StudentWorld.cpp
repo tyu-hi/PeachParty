@@ -204,6 +204,7 @@ int StudentWorld::move()
         temp->doSomething();
     }
 
+
     //3. delete any actors that have become inactive/dead during this tick
 
 
@@ -304,7 +305,7 @@ void StudentWorld::cleanUp()
     m_yoshi = nullptr;
 }
 
-bool StudentWorld::isEmpty(int dir, int chkX, int chkY)
+bool StudentWorld::isEmpty(int chkX, int chkY)
 {
     //create board object in student world
     //getContentsOf is in grid form

@@ -31,12 +31,23 @@ public:
   virtual int move();
   virtual void cleanUp();
 
-  //added:
-  bool isEmpty(int dir, int chkX, int chkY);
+  //Used for checking is valid position in Actor
+  bool isEmpty(int chkX, int chkY);
 
+  //Find player
   void findPeach(/*Actor* player, */int& playerX, int& playerY);
   void findPlayer(int player_num, int& playerX, int& playerY);
   void findYoshi(/*Actor* player, */int& playerX, int& playerY);
+  
+  Actor* getPeach()
+  {
+      return m_peach;
+  }
+  Actor* getYoshi()
+  {
+      return m_yoshi;
+  }
+
   //Player Coins
   void deductPlayerCoins(int player_num, int coins)
   {
@@ -69,7 +80,18 @@ public:
           return m_yoshi->getCoins();
       }
   }
-  //Add stars
+  void setPlayerCoins(int player_num, int coins)
+  {
+      if (player_num == 1)
+      {
+          m_peach->setCoins(coins);
+      }
+      else
+      {
+          m_yoshi->setCoins(coins);
+      }
+  }
+  //Stars
   void addPlayerStars(int player_num, int stars)
   {
       if (player_num == 1)
@@ -100,9 +122,82 @@ public:
       }
       else
       {
-          m_yoshi->getStars();
+          return m_yoshi->getStars();
       }
   }
+  void setPlayerStars(int player_num, int stars)
+  {
+      if (player_num == 1)
+      {
+          m_peach->setStars(stars);
+      }
+      else
+      {
+          m_yoshi->setStars(stars);
+      }
+  }
+
+  //Teleport in Event Square
+  void teleportPlayer(int playerNum)
+  {
+      bool isOn = false;
+      while (isOn == false)
+      {
+     /* for (;;)
+      {*/
+          int newX, newY;
+
+          newX = randInt(0, BOARD_WIDTH - 1);
+          newY = randInt(0, BOARD_HEIGHT - 1);
+          std::list<Actor*>::iterator p;
+          for (p = actor.begin(); p != actor.end(); p++)
+          {
+              Actor* temp = *p;
+              if (temp->getIsImpactable() == false && gameBoard.getContentsOf(newX, newY) != Board::empty)
+              {
+                  if (playerNum == 1)
+                  {
+                      m_peach->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
+                      //m_peach->setNewLocationY(newY);
+                  }
+                  else
+                  {
+                      m_yoshi->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
+                  }
+                  isOn = true;
+              }
+          }
+          //if (gameBoard.getContentsOf(newX, newY) != Board::empty)
+
+          //    //&& gameBoard.getContentsOf(newX, newY);
+          //{
+          //    if (playerNum == 1)
+          //    {
+          //        m_peach->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
+          //        //m_peach->setNewLocationY(newY);
+          //    }
+          //    else
+          //    {
+          //        m_yoshi->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
+          //    }
+          //    list->is impactable
+          //}
+      }   
+      isOn = false;
+  }
+  //
+  void movePlayer(int player_num, int playerX, int playerY)
+  {
+      if (player_num == 1)
+      {
+          m_peach->moveTo(playerX, playerY);
+      }
+      else
+      {
+          m_yoshi->moveTo(playerX, playerY);
+      }
+  }
+  
 
   //waitingToRoll
   bool getPlayerWaitingToRoll(int player_num)
@@ -125,6 +220,30 @@ public:
       else
       {
           return m_yoshi->setWaitingToRoll(value);
+      }
+  }
+  //Player Ticks
+  int getPlayerTicks(int player_num)
+  {
+      if (player_num == 1)
+      {
+          return m_peach->getTicks();
+
+      }
+      else
+      {
+          return m_yoshi->getTicks();
+      }
+  }
+  void changePlayerTicks(int player_num, int ticks)
+  {
+      if (player_num == 1)
+      {
+          m_peach->setPlayerTicks(ticks);
+      }
+      else
+      {
+          m_yoshi->setPlayerTicks(ticks);
       }
   }
   //Moving Direction of Player
@@ -162,6 +281,30 @@ public:
           m_yoshi->setDirection(dir);
       }
   }
+  int getSpriteDirection(int player_num)
+  {
+      if (player_num == 1)
+      {
+          return m_peach->getDirection();
+      }
+      else
+      {
+          return m_yoshi->getDieRoll();
+      }
+  }
+  
+  //Make Teleport
+ /* void setTeleport(int player_num, bool state)
+  {
+      if (player_num == 1)
+      {
+          m_peach->setTeleportStatus(state);
+      }
+      else
+      {
+          m_yoshi->setTeleportStatus(state);
+      }
+  }*/
 
   //Destructor
   virtual ~StudentWorld()
@@ -169,19 +312,7 @@ public:
       cleanUp();
   }
 
-  /*std::list<Actor*> getActors() const
-  {
-      std::list<Actor*> getActors;
-      for (auto p = actor.begin(); p != actor.end(); p++)
-      {
-          if ((*p)->getAlive())
-          {
-              getActors.push_back(*p);
-          }
-         
-      }
-      return getActors;
-  }*/
+  //Bank Coins
   void changeBankCoins(int change, int coins)
   {
       if (change == 1)
