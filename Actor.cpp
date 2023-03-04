@@ -225,6 +225,9 @@ void Players::doSomething()
 
         //moving in 2 pixels in direction
         moveAtAngle(getMovingDirection(), 2);
+        getWorld()->getPeach()->setJustSwappedStatus(false);
+        getWorld()->getYoshi()->setJustSwappedStatus(false);
+
         //decrementing ticks, each iteration
         setTicks(0);
 
@@ -295,7 +298,7 @@ void Peach::doSomething()
     
     //Allows you to exeucte code from derived class
     Players::doSomething();
-    getWorld()->getPeach()->setJustSwappedStatus(false);
+    //getWorld()->getPeach()->setJustSwappedStatus(false);
 
     //KeyMap
     /*{ 'a', { 1, ACTION_LEFT } },
@@ -381,16 +384,6 @@ bool Squares::isOverlappingPeach(int& peachX, int& peachY, int objectX, int obje
         return false;
     }
 }
-//actor a actor b
-//check overlap for vortex
-//overlap(Actor* a, Actor* b){
- //if getxa==getxb && getya!=getyb
-    //or/and? opposite
-
-    //calling in another function
-    //overlap(this, getPeach())     //"this" would be the class
-    //a->getX();
-//if callign this in vortex: this, bowser?
 
 bool Squares::isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY)
 {
@@ -792,13 +785,12 @@ void EventSquares::doSomething()
     int peachX, peachY, yoshiX, yoshiY;
     if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == true)
     {
-        
-        if (!getPeachOn() && getWorld()->getPeach()->getJustSwapped() == false)
+        if (!getPeachOn())
         {
-            std::cerr << "in event: " << std::endl;
+            //std::cerr << "in event: " << std::endl;
             //int randomAction = randInt(1, 1);
             std::cerr << randomAction << std::endl;
-                //option 1: teleported to random spot on board
+            //option 1: teleported to random spot on board
             if (randomAction == 1)
             {
                 std::cerr << "teleport " << std::endl;
@@ -806,27 +798,38 @@ void EventSquares::doSomething()
                 getWorld()->teleportPlayer(1);
                 getWorld()->playSound(SOUND_PLAYER_TELEPORT);
             }
-            if (randomAction == 2)
+            else if (randomAction == 2 && getWorld()->getPeach()->getJustSwapped() == false)
             {
-                std::cerr << "swap" << std::endl;
-                swap();
+                if (getWorld()->getYoshi()->getJustSwapped() == true)
+                {
+                    return;
+                }
+                else
+                {
+
+                    //setPeachOn(true);
+                    getWorld()->getPeach()->setJustSwappedStatus(true);
+                    std::cerr << "swap peach" << std::endl;
+                    swap();
+                }
             }
-            if (randomAction == 3)
+            else if (randomAction == 3)
             {
 
             }
         }
         setPeachOn(true);
-        getWorld()->getPeach()->setJustSwappedStatus(true);
+        
     }
     else
     {
-        getWorld()->getPeach()->setJustSwappedStatus(false);
+        //getWorld()->getPeach()->setJustSwappedStatus(false);
         setPeachOn(false);
     }
+
     if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(2) == true)
     {
-        if (!getYoshiOn() && getWorld()->getYoshi()->getJustSwapped() == false)
+        if (!getYoshiOn())
         {
             if (randomAction == 1)
             {
@@ -835,28 +838,35 @@ void EventSquares::doSomething()
                 getWorld()->teleportPlayer(2);
                 getWorld()->playSound(SOUND_PLAYER_TELEPORT);
             }
-            if (randomAction == 2)
+            else if (randomAction == 2 && getWorld()->getYoshi()->getJustSwapped() == false)
             {
-                swap();
-                std::cerr << "swap " << std::endl;
+                if (getWorld()->getPeach()->getJustSwapped() == true)
+                {
+                    return;
+                }
+                else
+                {
+
+
+                    getWorld()->getYoshi()->setJustSwappedStatus(true);
+                    swap();
+                    std::cerr << "swap yoshi" << std::endl;
+                }
             }
-            if (randomAction == 3)
+            else if (randomAction == 3)
             {
 
             }
         }
-        
         setYoshiOn(true);
-        getWorld()->getYoshi()->setJustSwappedStatus(true);
+       
     }
     else
     {
         setYoshiOn(false);
-        getWorld()->getYoshi()->setJustSwappedStatus(false);
+        //getWorld()->getYoshi()->setJustSwappedStatus(false);
     }
-
-    //option 2: swap position and movement state with another player.
-    //option 3: give player a vortex projectile
+   
 }
 
 DroppingSquares::DroppingSquares(StudentWorld* world, int startX, int startY)
