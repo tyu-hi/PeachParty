@@ -14,8 +14,6 @@ GameWorld* createStudentWorld(string assetPath)
 
 // Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
 
-// HI ty
-
 StudentWorld::StudentWorld(string assetPath)
     : GameWorld(assetPath), m_peachCoins(0), m_yoshiCoins(0)
 {
@@ -26,7 +24,6 @@ StudentWorld::StudentWorld(string assetPath)
 
     //actor.clear();
 }
-//
 int StudentWorld::init()
 {
 	//startCountdownTimer(5);  // this placeholder causes timeout after 5 seconds
@@ -321,35 +318,27 @@ bool StudentWorld::isEmpty(int chkX, int chkY)
 
 }
 
-void StudentWorld::findPeach(/*Actor* player, */int& playerX, int& playerY)
-{
-    playerX = m_peach->getX();
-    playerY = m_peach->getY();
-    
-    //std::cerr << "in peach" << std::endl;
-    ////playerY = m_peach->getY()
-    //list<Actor*>::iterator p;
-    //for (p = actor.begin(); p != actor.end(); p++)
-    //{
-    //    Actor* temp;
-    //    if (temp->isPlayer() &&)
-    //}
-}
-void StudentWorld::findPlayer(int player_num, int& playerX, int& playerY)
-{
-    if (player_num == 1)
-    {
-        playerX = m_peach->getX();
-        playerY = m_peach->getY();
-    }
-    else
-    {
-        playerX = m_yoshi->getX();
-        playerY = m_yoshi->getY();
-    }
-}
-void StudentWorld::findYoshi(/*Actor* player, */int& playerX, int& playerY)
-{
-    playerX = m_yoshi->getX();
-    playerY = m_yoshi->getY();
-}
+//void StudentWorld::findPeach(/*Actor* player, */int& playerX, int& playerY)
+//{
+//    playerX = m_peach->getX();
+//    playerY = m_peach->getY();
+//    
+//}
+//void StudentWorld::findPlayer(int player_num, int& playerX, int& playerY)
+//{
+//    if (player_num == 1)
+//    {
+//        playerX = m_peach->getX();
+//        playerY = m_peach->getY();
+//    }
+//    else
+//    {
+//        playerX = m_yoshi->getX();
+//        playerY = m_yoshi->getY();
+//    }
+//}
+//void StudentWorld::findYoshi(/*Actor* player, */int& playerX, int& playerY)
+//{
+//    playerX = m_yoshi->getX();
+//    playerY = m_yoshi->getY();
+//}

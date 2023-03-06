@@ -73,6 +73,24 @@ public:
 	void swapStars();
 	void swapCoins();
 
+	//Overlappping
+	virtual bool isOverLapping(Actor* a, Actor* b)
+	{
+		if (a->getX() == b->getX() && a->getY() == b->getY())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void setPeachOn(bool state);
+	bool getPeachOn();
+	void setYoshiOn(bool state);
+	bool getYoshiOn();
+
 	//Impactable for nonsquares
 	virtual bool getIsImpactable()
 	{
@@ -187,9 +205,14 @@ public:
 	}
 	int getDieRoll()
 	{
+		if (m_dieRoll <= 0)
+		{
+			m_dieRoll = 0;
+		}
 		//std::cerr << m_dieRoll << std::endl;
 		return m_dieRoll;
 	}
+	//Just swapped on Event Square
 	bool getJustSwapped()
 	{
 		return justSwapped;
@@ -197,6 +220,16 @@ public:
 	void setJustSwappedStatus(bool state)
 	{
 		justSwapped = state;
+	}
+	
+	//On directional square
+	bool isOnDirectionalSquare()
+	{
+		return m_onDirectionalSquare;
+	}
+	void setOnDirectionalSquare(bool state)
+	{
+		m_onDirectionalSquare = state;
 	}
 
 	//int getLocation();
@@ -230,6 +263,11 @@ private:
 	bool m_impactable;
 
 	bool justSwapped;
+
+	bool m_onDirectionalSquare;
+	
+	bool isPeachOnSquare;
+	bool isYoshiOnSquare;
 };
 
 
@@ -242,8 +280,8 @@ public:
 	int getMovingDirection();
 	void setMovingDirection(int dir);
 
-	void setNewLocationX(int newX);
-	void setNewLocationY(int newY);
+	/*void setNewLocationX(int newX);
+	void setNewLocationY(int newY);*/
 	
 	virtual void doSomething();
 	
@@ -277,32 +315,25 @@ public:
 class Baddie :public Actor
 {
 public:
-	Baddie(StudentWorld* world, const int imageID, int startX, int startY)
-		:Actor(world, imageID, startX, startY)
-	{
+	Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance = 0, bool walkingState = false);
+	
+	bool getWalkingState();
+	void setWalkingState(bool state);
 
-	}
-	virtual void walkingState() {};
 	virtual void pausedState() {};
+private:
+	bool walkingState;
 };
 class Bowser : public Baddie
 {
 public:
-	Bowser(StudentWorld* world, int startX, int startY)
-		:Baddie(world, IID_BOWSER, startX, startY)
-	{
-
-	}
-	virtual void doSomething() {};
+	Bowser(StudentWorld* world, int startX, int startY);
+	virtual void doSomething();
 };
 class Boo : public Baddie
 {
 public:
-	Boo(StudentWorld* world, int startX, int startY)
-		:Baddie(world, IID_BOO, startX, startY)
-	{
-
-	}
+	Boo(StudentWorld* world, int startX, int startY);
 	virtual void doSomething() {};
 };
 
@@ -334,24 +365,24 @@ public:
 
 private:
 	std::string color;
-	bool m_PeachOnSquare;
-	bool m_YoshiOnSquare;
+	/*bool m_PeachOnSquare;
+	bool m_YoshiOnSquare;*/
 };
 
 class Squares :public Actor
 {
 public:
 	Squares(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth);
-	bool isOverlappingPeach(int& peachX, int& peachY, int objectX, int objectY);
-	bool isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY);
-	void setPeachOn(bool state);
+	//bool isOverlappingPeach(int& peachX, int& peachY, int objectX, int objectY);
+	//bool isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY);
+	/*void setPeachOn(bool state);
 	bool getPeachOn();
 	void setYoshiOn(bool state);
-	bool getYoshiOn();
+	bool getYoshiOn();*/
 	virtual bool getIsImpactable();
 private:
-	bool isPeachOnSquare;
-	bool isYoshiOnSquare;
+	/*bool isPeachOnSquare;
+	bool isYoshiOnSquare;*/
 };
 class StarSquare : public Squares
 {

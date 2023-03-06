@@ -10,6 +10,8 @@ Actor::Actor(StudentWorld* world, const int imageID, int startX, int startY, int
         , m_alive(true), m_playerCoins(0), m_playerStars(0), m_goTeleport(false), justSwapped(false) //, ticks_to_move(ticks)
 {
     m_world = world;
+    isPeachOnSquare = false;
+    isYoshiOnSquare = false;
 }
 Actor::~Actor()	//always have it
 {	}
@@ -104,17 +106,22 @@ void Actor::swapCoins()
     getWorld()->setPlayerCoins(1, getWorld()->getPlayerCoins(2));
     getWorld()->setPlayerCoins(2, tempCoins);
 }
-
-/*
-void Actor::setTeleportStatus(bool teleportStatus)
+void Actor::setPeachOn(bool state)
 {
-    m_goTeleport = teleportStatus;
+    isPeachOnSquare = state;
 }
-bool Actor::getTeleportStatus()
+void Actor::setYoshiOn(bool state)
 {
-    return m_goTeleport;
-}*/
-
+    isYoshiOnSquare = state;
+}
+bool Actor::getPeachOn()
+{
+    return isPeachOnSquare;
+}
+bool Actor::getYoshiOn()
+{
+    return isYoshiOnSquare;
+}
 
 Players::Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks) 
 //, int startDirection, int depth, double size)
@@ -145,23 +152,20 @@ void Players::doSomething()
 {
     if (getWaitingToRoll() == false)	//since waiting to roll is false, walking state is active
     {
-
         //C. if avatar can't coitinue moving in current direction
         //update avatar's walk direction so it can turn to face a new direction perpendicular to walking direction.
-
-        //c.
-        //do a is valid position function, in actor class, or do a is valid position in student world only
-        //check if position is empty using studentworld's getContentsOF
-        //only studentworld has access to board, so is empty should be in that
-
+                //do: a is valid position function, in actor class, or do a is valid position in student world only
+                //check if position is empty using studentworld's getContentsOF
+                //only studentworld has access to board, so is empty should be in that
         //getX() provides pixels, so divide by 16 to get grid space!
-        int gridX = getX() / SPRITE_WIDTH;
-        int gridY = getY() / SPRITE_HEIGHT;
+
         //every tick you move 2 pixels, so 8 ticks you move 16 pixels, which is one square
         //each block is 16 pixels by 16 pixels
         if (getTicks() % 8 == 0)
             //if (getX() % 16 == 0 && getY() % 16 == 0)
         {
+            int gridX = getX() / SPRITE_WIDTH;
+            int gridY = getY() / SPRITE_HEIGHT;
             setDieRoll(0);
             if (getMovingDirection() == right || getMovingDirection() == left)
             {
@@ -223,11 +227,9 @@ void Players::doSomething()
             }
         }
 
+
         //moving in 2 pixels in direction
         moveAtAngle(getMovingDirection(), 2);
-        getWorld()->getPeach()->setJustSwappedStatus(false);
-        getWorld()->getYoshi()->setJustSwappedStatus(false);
-
         //decrementing ticks, each iteration
         setTicks(0);
 
@@ -244,35 +246,21 @@ Peach::Peach(StudentWorld* world, int startX, int startY)
 {    }
 void Peach::doSomething()
 {
-    //should always pass in 1 to get action
-    //int action = ->getAction(1)
-    
-    /*if (alive == true)
-    {*/
 
+    if (getDirection() == right)
+    {
+        setDirection(right);
+    }
+    if (getDirection() == left)
+    {
+        setDirection(left);
+    }
     if (getWaitingToRoll() == true)
     {
         int die_roll;
         int action = getWorld()->getAction(1);
         switch (action)
         {
-        case ACTION_RIGHT:
-            //std::cerr << "move?" << std::endl;
-            //change direction to right!
-            setDirection(right);
-            setMovingDirection(right);
-            break;
-        case ACTION_LEFT:
-            setMovingDirection(left);
-            break;
-        case ACTION_UP:
-            //setDirection(up);
-            setMovingDirection(up);
-            break;
-        case ACTION_DOWN:
-            //setDirection(down);
-            setMovingDirection(down);
-            break;
         case ACTION_ROLL:
             //1. change ticks_to_move = die_roll * 8;
             die_roll = randInt(1, 10);
@@ -296,12 +284,92 @@ void Peach::doSomething()
         }
     }
     
-    //Allows you to exeucte code from derived class
+    //1.b Else if avatar is directly on top fo a square at a fork
+    if (getWaitingToRoll() == false)
+    {
+        if (getTicks() % 8 == 0)
+        {
+            //std::cerr << "checking if at fork square " << std::endl;
+            if (isOnDirectionalSquare() == false)
+            {
+                //std::cerr << "checking for fork " << std::endl;
+                int numOfDirections = 0;
+                if (isValidPos(right) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking right " << std::endl;
+                }
+                if (isValidPos(left) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking left " << std::endl;
+                }
+                if (isValidPos(up) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking up " << std::endl;
+                }
+                if (isValidPos(down) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking down " << std::endl;
+                }
+                if (numOfDirections >= 3)
+                {
+                    int PeachAction = getWorld()->getAction(1);
+                    int YoshiAction = getWorld()->getAction(2);
+
+                    switch (PeachAction)
+                    {
+                        std::cerr << "in fork " << std::endl;
+                    case ACTION_RIGHT:
+                        //std::cerr << "move?" << std::endl;
+                        //change direction to right!
+                        if (isValidPos(right) )//&& getMovingDirection() != left)
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed right " << std::endl;
+                            setMovingDirection(right);
+                        }
+                        break;
+                    case ACTION_LEFT:
+                        if (isValidPos(left) )//&& getMovingDirection() != right)
+                        {
+                            setDirection(left);
+                            std::cerr << "pressed left " << std::endl;
+                            setMovingDirection(left);
+                        }
+                        break;
+                    case ACTION_UP:
+                        if (isValidPos(up) )//&& getMovingDirection() != down)
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed up " << std::endl;
+                            setMovingDirection(up);
+                        }
+                        break;
+                    case ACTION_DOWN:
+                        if (isValidPos(down) )//&& getMovingDirection() != up)
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed down " << std::endl;
+                            setMovingDirection(down);
+                        }
+                        break;
+                    default:
+                        return;
+                    }
+                }
+            }
+        }
+    }
     Players::doSomething();
-    //getWorld()->getPeach()->setJustSwappedStatus(false);
+    setJustSwappedStatus(false);
+    setOnDirectionalSquare(false);
 
     //KeyMap
-    /*{ 'a', { 1, ACTION_LEFT } },
+    /*
+    { 'a',             { 1, ACTION_LEFT } },
     { 'd',             { 1, ACTION_RIGHT } },
     { 'w',             { 1, ACTION_UP } },
     { 's',             { 1, ACTION_DOWN } },
@@ -313,8 +381,6 @@ void Peach::doSomething()
     { KEY_PRESS_DOWN,  { 2, ACTION_DOWN } },
     { KEY_PRESS_ENTER, { 2, ACTION_ROLL } },
     { '\\',            { 2, ACTION_FIRE } },*/
-    
-    //if teleport flag is true, set player's flag in event square, teleport
 }
 
 Yoshi::Yoshi(StudentWorld* world, int startX, int startY)
@@ -322,29 +388,21 @@ Yoshi::Yoshi(StudentWorld* world, int startX, int startY)
 {   }
 void Yoshi::doSomething()
 {
+    if (getDirection() == right)
+    {
+        setDirection(right);
+    }
+    if (getDirection() == left)
+    {
+        setDirection(left);
+    }
+
     if (getWaitingToRoll() == true)
     {
         int die_roll;
         int action = getWorld()->getAction(2);
         switch (action)
         {
-        case ACTION_RIGHT:
-            //std::cerr << "move?" << std::endl;
-            //change direction to right!
-            setDirection(right);
-            setMovingDirection(right);
-            break;
-        case ACTION_LEFT:
-            setMovingDirection(left);
-            break;
-        case ACTION_UP:
-            //setDirection(up);
-            setMovingDirection(up);
-            break;
-        case ACTION_DOWN:
-            //setDirection(down);
-            setMovingDirection(down);
-            break;
         case ACTION_ROLL:
             //1. change ticks_to_move = die_roll * 8;
             die_roll = randInt(1, 10);
@@ -361,69 +419,128 @@ void Yoshi::doSomething()
             return;	//nothing pressed, return?
         }
     }
+    if (getWaitingToRoll() == false)
+    {
+        if (getTicks() % 8 == 0)
+        {
+            //std::cerr << "checking if at fork square " << std::endl;
+            if (isOnDirectionalSquare() == false)
+            {
+                //std::cerr << "checking for fork " << std::endl;
+                int numOfDirections = 0;
+                if (isValidPos(right) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking right " << std::endl;
+                }
+                if (isValidPos(left) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking left " << std::endl;
+                }
+                if (isValidPos(up) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking up " << std::endl;
+                }
+                if (isValidPos(down) == true)
+                {
+                    numOfDirections++;
+                    //std::cerr << "checking down " << std::endl;
+                }
+                if (numOfDirections >= 3)
+                {
+                    int YoshiAction = getWorld()->getAction(2);
+
+                    switch (YoshiAction)
+                    {
+                        std::cerr << "in fork " << std::endl;
+                    case ACTION_RIGHT:
+                        //std::cerr << "move?" << std::endl;
+                        //change direction to right!
+                        if (isValidPos(right))
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed right " << std::endl;
+                            setMovingDirection(right);
+                        }
+                        break;
+                    case ACTION_LEFT:
+                        if (isValidPos(left))
+                        {
+                            setDirection(left);
+                            std::cerr << "pressed left " << std::endl;
+                            setMovingDirection(left);
+                        }
+                        break;
+                    case ACTION_UP:
+                        if (isValidPos(up))
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed up " << std::endl;
+                            setMovingDirection(up);
+                        }
+                        break;
+                    case ACTION_DOWN:
+                        if (isValidPos(down))
+                        {
+                            setDirection(right);
+                            std::cerr << "pressed down " << std::endl;
+                            setMovingDirection(down);
+                        }
+                        break;
+                    default:
+                        return;
+                    }
+                }
+            }
+        }
+    }
     Players::doSomething();
+    setJustSwappedStatus(false);
+    setOnDirectionalSquare(false);
+
+
     //getWorld()->getYoshi()->setJustSwappedStatus(false);
 
 }
 
 Squares::Squares(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth)
     :Actor(world, imageID, startX, startY, startDirection, 1)
-{   
-    isPeachOnSquare = false;
-    isYoshiOnSquare = false;
-}
-bool Squares::isOverlappingPeach(int& peachX, int& peachY, int objectX, int objectY)
-{
-    getWorld()->findPlayer(1, peachX, peachY);
-    if (peachX == objectX && peachY == objectY)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
+{   }
+//bool Squares::isOverlappingPeach(int& peachX, int& peachY, int objectX, int objectY)
+//{
+//    getWorld()->findPeach(peachX, peachY);
+//    if (peachX == objectX && peachY == objectY)
+//    {
+//        return true;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+//}
 
-bool Squares::isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY)
-{
-    getWorld()->findYoshi(yoshiX, yoshiY);
-    if (yoshiX == objectX && yoshiY == objectY)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
+//bool Squares::isOverlappingYoshi(int& yoshiX, int& yoshiY, int objectX, int objectY)
+//{
+//    getWorld()->findYoshi(yoshiX, yoshiY);
+//    if (yoshiX == objectX && yoshiY == objectY)
+//    {
+//        return true;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+//}
 bool Squares::getIsImpactable()
 {
     return false;
 }
-void Squares::setPeachOn(bool state)
-{
-    isPeachOnSquare = state;
-}
-void Squares::setYoshiOn(bool state)
-{
-    isYoshiOnSquare = state;
-}
-bool Squares::getPeachOn()
-{
-    return isPeachOnSquare;
-}
-bool Squares::getYoshiOn()
-{
-    return isYoshiOnSquare;
-}
 
 CoinSquare::CoinSquare(StudentWorld* world, const int imageID, int startX, int startY, std::string color)
     : Actor(world, imageID, startX, startY, 0, 1, 1.00), color(color) //, m_alive(true)
-{
-    m_PeachOnSquare = false;
-    m_YoshiOnSquare = false;
-}
+{   }
 void CoinSquare::deactivate()
 {
     setAlive(false);
@@ -449,14 +566,16 @@ void CoinSquare::getRedSquare()
     {
         return;
     }
-    int peachX, peachY, yoshiX, yoshiY;
+   /* int peachX, peachY, yoshiX, yoshiY;
 
     getWorld()->findPeach(peachX, peachY);
-    getWorld()->findYoshi(yoshiX, yoshiY);
+    getWorld()->findYoshi(yoshiX, yoshiY);*/
 
-    if (peachX == getX() && peachY == getY())
+   /* if (peachX == getX() && peachY == getY())
+    {*/
+    if (isOverLapping(this, getWorld()->getPeach()))
     {
-        if (!m_PeachOnSquare)
+        if (!getPeachOn())
         {
             if (getWorld()->getPlayerWaitingToRoll(1) == true)
             {
@@ -466,15 +585,18 @@ void CoinSquare::getRedSquare()
                 getWorld()->playSound(SOUND_TAKE_COIN);
             }
         }
-        m_PeachOnSquare = true;
+        setPeachOn(true);
     }
     else
     {
-        m_PeachOnSquare = false;
+        setPeachOn(false);
     }
-    if (yoshiX == getX() && yoshiY == getY())
+
+    /*if (yoshiX == getX() && yoshiY == getY())
+    {*/
+    if (isOverLapping(this, getWorld()->getYoshi()))
     {
-        if (!m_YoshiOnSquare)
+        if (!getYoshiOn())
         {
             if (getWorld()->getPlayerWaitingToRoll(2) == true)
             {
@@ -483,11 +605,11 @@ void CoinSquare::getRedSquare()
                 getWorld()->playSound(SOUND_TAKE_COIN);
             }
         }
-        m_YoshiOnSquare = true;
+        setYoshiOn(true);
     }
     else
     {
-        m_YoshiOnSquare = false;
+        setYoshiOn(false);
     }
 
     return;
@@ -499,33 +621,40 @@ void CoinSquare::getBlueSquare()
     {
         return;
     }
-    int peachX, peachY, yoshiX, yoshiY;
+  /*  int peachX, peachY, yoshiX, yoshiY;
 
     getWorld()->findPeach(peachX, peachY);
-    getWorld()->findYoshi(yoshiX, yoshiY);
+    getWorld()->findYoshi(yoshiX, yoshiY);*/
 
-    if (peachX == getX() && peachY == getY())
+    if (isOverLapping(this, getWorld()->getPeach()))
     {
-        if (!m_PeachOnSquare)
-        {
-            if (getWorld()->getPlayerWaitingToRoll(1) == true)
+
+
+       /* if (peachX == getX() && peachY == getY())
+        {*/
+            if (!getPeachOn())
             {
-                getWorld()->addPlayerCoins(1, 3);
-                //std::cerr << peachX / 16 << " " << peachY / 16 << std::endl;
-                //std::cerr << "add peach coins " << std::endl;
-                getWorld()->playSound(SOUND_GIVE_COIN);
+                if (getWorld()->getPlayerWaitingToRoll(1) == true)
+                {
+                    getWorld()->addPlayerCoins(1, 3);
+                    //std::cerr << peachX / 16 << " " << peachY / 16 << std::endl;
+                    //std::cerr << "add peach coins " << std::endl;
+                    getWorld()->playSound(SOUND_GIVE_COIN);
+                }
             }
-        }
-        m_PeachOnSquare = true;
+            setPeachOn(true);
+            // }
     }
     else
     {
-        m_PeachOnSquare = false;
+        setPeachOn(false);
     }
 
-    if (yoshiX == getX() && yoshiY == getY())
+    if (isOverLapping(this, getWorld()->getYoshi()))
     {
-        if (!m_YoshiOnSquare)
+  /*  if (yoshiX == getX() && yoshiY == getY())
+  */ 
+        if (!getYoshiOn())
         {
             if (getWorld()->getPlayerWaitingToRoll(2) == true)
             {
@@ -534,11 +663,11 @@ void CoinSquare::getBlueSquare()
                 getWorld()->playSound(SOUND_GIVE_COIN);
             }
         }
-        m_YoshiOnSquare = true;
+        setYoshiOn(true);
     }
     else
     {
-        m_YoshiOnSquare = false;
+        setYoshiOn(false);
     }
 
     return;
@@ -551,8 +680,10 @@ StarSquare::StarSquare(StudentWorld* world, int startX, int startY)
 void StarSquare::doSomething()
 {
     //Checking Peach
-    int peachX, peachY, yoshiX, yoshiY;
+    /*int peachX, peachY, yoshiX, yoshiY;
     if (isOverlappingPeach(peachX, peachY, getX(), getY()))
+    {*/
+    if (isOverLapping(this, getWorld()->getPeach()))
     {
         if (!getPeachOn())
         {
@@ -575,7 +706,9 @@ void StarSquare::doSomething()
     }
 
     //Checking Yoshi
-    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    /*if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    {*/
+    if (isOverLapping(this, getWorld()->getYoshi()))
     {
         if (!getYoshiOn())
         {
@@ -621,9 +754,12 @@ void DirectionalSquares::doSomething()
     {
     //
     int theDirection = getDirectionSquare();
-    int peachX, peachY, yoshiX, yoshiY;
+    /*int peachX, peachY, yoshiX, yoshiY;
     if (isOverlappingPeach(peachX, peachY, getX(), getY()))
+    {*/
+    if (isOverLapping(this, getWorld()->getPeach()))
     {
+        getWorld()->getPeach()->setOnDirectionalSquare(true);
         switch (theDirection)
         {
         case 1: //up
@@ -647,10 +783,14 @@ void DirectionalSquares::doSomething()
         }
     }
 
-    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+   /* if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    {*/
+    if (isOverLapping(this, getWorld()->getYoshi()))
     {
 
         //std::cerr << "yoshi check";
+
+        getWorld()->getYoshi()->setOnDirectionalSquare(true);
         switch (theDirection)
         {
         case 1: //up
@@ -683,9 +823,11 @@ BankSquares::BankSquares(StudentWorld* world, int startX, int startY)
 void BankSquares::doSomething()
 {
     //std::cerr << getWorld()->getBankCoins();
-    int peachX, peachY, yoshiX, yoshiY;
-    //Peach
-    if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    //int peachX, peachY, yoshiX, yoshiY;
+    ////Peach
+    //if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    //{
+    if (isOverLapping(this, getWorld()->getPeach()) && getWorld()->getPlayerWaitingToRoll(1) == false)
     {
         int deductedCoins = 0;
         //check if player will go broke when deducting 5 coins
@@ -708,7 +850,7 @@ void BankSquares::doSomething()
             getWorld()->playSound(SOUND_DEPOSIT_BANK);
         }
     }
-    else if (isOverlappingPeach(peachX, peachY, getX(), getY()))    //player landed on
+    else if (isOverLapping(this, getWorld()->getPeach()))   //player landed on
     {
         if (!getPeachOn())
         {
@@ -726,7 +868,9 @@ void BankSquares::doSomething()
     }
 
     //Yoshi
-    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(2) == false)
+ /*   if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(2) == false)
+    {*/
+    if (isOverLapping(this, getWorld()->getYoshi()) && getWorld()->getPlayerWaitingToRoll(2) == false)
     {
         int deductedCoins = 0;
         if (getWorld()->getPlayerCoins(2) - 5 <= 0)
@@ -748,7 +892,7 @@ void BankSquares::doSomething()
             getWorld()->playSound(SOUND_DEPOSIT_BANK);
         }
     }
-    else if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()))
+    else if (isOverLapping(this, getWorld()->getYoshi()))
     {
         if (!getYoshiOn())
         {
@@ -774,45 +918,42 @@ void BankSquares::doSomething()
 
 EventSquares::EventSquares(StudentWorld* world, int startX, int startY)
     :Squares(world, IID_EVENT_SQUARE, startX, startY, 0, 1)
-{
-
-}
+{   }
 void EventSquares::doSomething()
 {
-    //int randomAction = randInt(1, 2);
-
-    int randomAction = 2;
-    int peachX, peachY, yoshiX, yoshiY;
-    if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == true)
+    int randomAction = randInt(1, 2);
+    //int randomAction = 3;
+    //int peachX, peachY, yoshiX, yoshiY;
+    if (isOverLapping(this, getWorld()->getPeach()) && getWorld()->getPlayerWaitingToRoll(1) == true)
     {
-        if (!getPeachOn())
+        if (!getPeachOn() && getWorld()->getPeach()->getJustSwapped() == false)
         {
-            //std::cerr << "in event: " << std::endl;
-            //int randomAction = randInt(1, 1);
-            std::cerr << randomAction << std::endl;
             //option 1: teleported to random spot on board
-            if (randomAction == 1)
+            if (randomAction == 1 && getWorld()->getYoshi()->getJustSwapped() == false)
             {
-                std::cerr << "teleport " << std::endl;
+                std::cerr << "teleport peach " << std::endl;
                 //getWorld()->setTeleport(1, true);
                 getWorld()->teleportPlayer(1);
                 getWorld()->playSound(SOUND_PLAYER_TELEPORT);
             }
+            //option 2: swap coordinates, ticks, walk + sprite direction, and roll state with players
             else if (randomAction == 2 && getWorld()->getPeach()->getJustSwapped() == false)
             {
+
                 if (getWorld()->getYoshi()->getJustSwapped() == true)
                 {
-                    return;
+                    //return;
                 }
                 else
                 {
-
                     //setPeachOn(true);
                     getWorld()->getPeach()->setJustSwappedStatus(true);
-                    std::cerr << "swap peach" << std::endl;
+                    //std::cerr << "swap peach" << std::endl;
                     swap();
+                    getWorld()->playSound(SOUND_PLAYER_TELEPORT);
                 }
             }
+            //option 3: give player a vortex projectile
             else if (randomAction == 3)
             {
 
@@ -827,11 +968,11 @@ void EventSquares::doSomething()
         setPeachOn(false);
     }
 
-    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(2) == true)
+    if (isOverLapping(this, getWorld()->getYoshi()) && getWorld()->getPlayerWaitingToRoll(2) == true)
     {
-        if (!getYoshiOn())
+        if (!getYoshiOn() && getWorld()->getYoshi()->getJustSwapped() == false)
         {
-            if (randomAction == 1)
+            if (randomAction == 1 && getWorld()->getPeach()->getJustSwapped() == false)
             {
                 std::cerr << "teleport yoshi" << std::endl;
                 //getWorld()->setTeleport(1, true);
@@ -842,15 +983,14 @@ void EventSquares::doSomething()
             {
                 if (getWorld()->getPeach()->getJustSwapped() == true)
                 {
-                    return;
+                    //return;
                 }
                 else
                 {
-
-
                     getWorld()->getYoshi()->setJustSwappedStatus(true);
                     swap();
                     std::cerr << "swap yoshi" << std::endl;
+                    getWorld()->playSound(SOUND_PLAYER_TELEPORT);
                 }
             }
             else if (randomAction == 3)
@@ -876,9 +1016,9 @@ DroppingSquares::DroppingSquares(StudentWorld* world, int startX, int startY)
 void DroppingSquares::doSomething()
 {
     int randomAction = randInt(1, 2);
-    int peachX, peachY, yoshiX, yoshiY;
+    //int peachX, peachY, yoshiX, yoshiY;
     //Peach
-    if (isOverlappingPeach(peachX, peachY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    if (isOverLapping(this, getWorld()->getPeach()) && getWorld()->getPlayerWaitingToRoll(1) == false)
     {
         if (randomAction == 1)
         {
@@ -910,7 +1050,7 @@ void DroppingSquares::doSomething()
         }
     }
 
-    if (isOverlappingYoshi(yoshiX, yoshiY, getX(), getY()) && getWorld()->getPlayerWaitingToRoll(1) == false)
+    if (isOverLapping(this, getWorld()->getYoshi()) && getWorld()->getPlayerWaitingToRoll(1) == false)
     {
         if (randomAction == 1)
         {
@@ -942,7 +1082,46 @@ void DroppingSquares::doSomething()
         }
     }
 }
+Baddie::Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance, bool walkingState)
+    :Actor(world, imageID, startX, startY)
+{
 
+}
+bool Baddie::getWalkingState()
+{
+    return walkingState;
+}
+void Baddie::setWalkingState(bool state)
+{
+    walkingState = state;
+}
+
+Bowser::Bowser(StudentWorld* world, int startX, int startY)
+    :Baddie(world, IID_BOWSER, startX, startY)
+{
+    int randomAction = randInt(1, 2);
+    if (getWalkingState() == false)
+    {
+        if (isOverLapping(this, getWorld()->getPeach()))
+        {
+            if (randomAction == 1)
+            {
+                //reset coins
+                getWorld()->getPeach()->setCoins(0);
+                getWorld()->playSound(SOUND_BOO_ACTIVATE);
+            }
+        }
+    }
+}
+Boo::Boo(StudentWorld* world, int startX, int startY)
+    :Baddie(world, IID_BOO, startX, startY)
+{
+
+}
+void Bowser::doSomething()
+{
+    //if (getWorld()->getPeach()->)
+}
 
 Vortex::Vortex(StudentWorld* world, int startX, int startY)
     :Actor(world, IID_VORTEX, startX, startY, 0, 0)

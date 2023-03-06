@@ -35,9 +35,9 @@ public:
   bool isEmpty(int chkX, int chkY);
 
   //Find player
-  void findPeach(/*Actor* player, */int& playerX, int& playerY);
-  void findPlayer(int player_num, int& playerX, int& playerY);
-  void findYoshi(/*Actor* player, */int& playerX, int& playerY);
+  //void findPeach(/*Actor* player, */int& playerX, int& playerY);
+  //void findPlayer(int player_num, int& playerX, int& playerY);
+  //void findYoshi(/*Actor* player, */int& playerX, int& playerY);
   
   Actor* getPeach()
   {
@@ -289,7 +289,7 @@ public:
       }
       else
       {
-          return m_yoshi->getDieRoll();
+          return m_yoshi->getDirection();
       }
   }
   
