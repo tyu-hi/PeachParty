@@ -1238,7 +1238,7 @@ void Baddie::setWalkingState(bool state)
 }
 void Baddie::doBaddieStuff(int enemyNum)
 {
-    int randomAction = randInt(1, 2);   //50% chance of doing something when landed on
+    int randomAction = randInt(1, 2);   //50% chance of bowser doing something when landed on
     //int randomAction = 1;
     if (getWalkingState() == false) //AKA in pause state
     {
@@ -1256,16 +1256,19 @@ void Baddie::doBaddieStuff(int enemyNum)
                     getWorld()->getPeach()->setCoins(0);
                     getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
                 }
-                else if (randomAction == 1 && enemyNum == 2)
+                else if (enemyNum == 2) //boo always does something
                 {
                     int booRandomAction = randInt(1, 2);
                     if (booRandomAction == 1)
                     {
+                        std::cerr << "boo on peach" << std::endl;
                         swapCoins();
                         getWorld()->playSound(SOUND_BOO_ACTIVATE);
                     }
                     else
                     {
+
+                        std::cerr << "boo on peach" << std::endl;
                         swapStars();
                         getWorld()->playSound(SOUND_BOO_ACTIVATE);
                     }
@@ -1292,11 +1295,14 @@ void Baddie::doBaddieStuff(int enemyNum)
                     int booRandomAction = randInt(1, 2);
                     if (booRandomAction == 1)
                     {
+
+                        std::cerr << "boo on yoshi" << std::endl;
                         swapCoins();
                         getWorld()->playSound(SOUND_BOO_ACTIVATE);
                     }
                     else
                     {
+                        std::cerr << "boo on yoshi" << std::endl;
                         swapStars();
                         getWorld()->playSound(SOUND_BOO_ACTIVATE);
                     }
