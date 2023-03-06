@@ -91,14 +91,12 @@ public:
 	void setYoshiOn(bool state);
 	bool getYoshiOn();
 
+	bool atAFork();
+
 	//Impactable for nonsquares
 	virtual bool getIsImpactable()
 	{
 		return true;
-	}
-	void setIsImpactable(bool state)
-	{
-		m_impactable = state;
 	}
 	//Coins
 	void addCoins(int coins)
@@ -231,6 +229,8 @@ public:
 	{
 		m_onDirectionalSquare = state;
 	}
+	int getMovingDirection();
+	void setMovingDirection(int dir);
 
 	//int getLocation();
 	//void setLocation(int xNew, int yNew);
@@ -255,8 +255,8 @@ private:
 	int m_playerCoins;
 	int m_playerStars;
 
-	int m_objectX;
-	int m_objectY;
+	//int m_objectX;
+	//int m_objectY;
 
 	bool m_goTeleport;
 
@@ -268,6 +268,8 @@ private:
 	
 	bool isPeachOnSquare;
 	bool isYoshiOnSquare;
+
+	int movingDirection;
 };
 
 
@@ -277,19 +279,20 @@ class Players : public Actor
 public:
 	Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks);
 
-	int getMovingDirection();
-	void setMovingDirection(int dir);
+	/*int getMovingDirection();
+	void setMovingDirection(int dir);*/
 
 	/*void setNewLocationX(int newX);
 	void setNewLocationY(int newY);*/
 	
 	virtual void doSomething();
-	
+	virtual bool getIsImpactable();
+
 	/*void shouldTeleport(bool teleportStatus);
 	bool getTeleportStatus();*/
 	//void setVortex(Vortex* vortex);
 private:
-	int movingDirection; //right = 0 from graphobject
+	//int movingDirection; //right = 0 from graphobject
 	//Vortex* m_vortex;
 	//bool goTeleport;
 	
@@ -300,7 +303,6 @@ class Peach : public Players
 public:
 	Peach(StudentWorld* world, int startX, int startY);
 	virtual void doSomething();
-
 private:
 	
 };
@@ -315,14 +317,32 @@ public:
 class Baddie :public Actor
 {
 public:
-	Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance = 0, bool walkingState = false);
+	Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance = 0);
 	
 	bool getWalkingState();
 	void setWalkingState(bool state);
 
-	virtual void pausedState() {};
+	void setPauseCounter(int number)
+	{
+		if (number <= 0)
+		{
+			pauseCounter--;
+		}
+		else
+		{
+			pauseCounter = number;
+		}
+	}
+	int getPauseCounter()
+	{
+		return pauseCounter;
+	}
+	virtual void doSomething();
+	void doBaddieStuff(int enemyNum);
 private:
 	bool walkingState;
+	int pauseCounter;
+	//int squares_to_move;
 };
 class Bowser : public Baddie
 {
@@ -334,7 +354,7 @@ class Boo : public Baddie
 {
 public:
 	Boo(StudentWorld* world, int startX, int startY);
-	virtual void doSomething() {};
+	virtual void doSomething();
 };
 
 //Squares
@@ -439,8 +459,6 @@ public:
 	
 private:
 	bool activeState;
-
-
 };
 
 #endif // ACTOR_H

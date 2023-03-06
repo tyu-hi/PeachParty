@@ -166,11 +166,13 @@ int StudentWorld::init()
                 case Board::bowser:
                 {
                     actor.push_back(new Bowser(this, boardX, boardY));
+                    actor.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, boardX, boardY, "blue"));
                     break;
                 }
                 case Board::boo:
                 {
                     actor.push_back(new Boo(this, boardX, boardY));
+                    actor.push_back(new CoinSquare(this, IID_BLUE_COIN_SQUARE, boardX, boardY, "blue"));
                     break;
                 }
                

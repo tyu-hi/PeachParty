@@ -167,35 +167,40 @@ public:
                   isOn = true;
               }
           }
-          //if (gameBoard.getContentsOf(newX, newY) != Board::empty)
-
-          //    //&& gameBoard.getContentsOf(newX, newY);
-          //{
-          //    if (playerNum == 1)
-          //    {
-          //        m_peach->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
-          //        //m_peach->setNewLocationY(newY);
-          //    }
-          //    else
-          //    {
-          //        m_yoshi->moveTo(newX * SPRITE_HEIGHT, newY * SPRITE_WIDTH);
-          //    }
-          //    list->is impactable
-          //}
       }   
       isOn = false;
   }
-  //
-  void movePlayer(int player_num, int playerX, int playerY)
+  //Teleport Player
+  //void movePlayer(int player_num, int playerX, int playerY)
+  //{
+  //    if (player_num == 1)
+  //    {
+  //        m_peach->moveTo(playerX, playerY);
+  //    }
+  //    else
+  //    {
+  //        m_yoshi->moveTo(playerX, playerY);
+  //    }
+  //}
+
+  //Is a Square
+  bool isOnASquare(int objectX, int objectY)
   {
-      if (player_num == 1)
+      std::list<Actor*>::iterator p;
+      for (p = actor.begin(); p != actor.end(); p++)
       {
-          m_peach->moveTo(playerX, playerY);
+          Actor* temp = *p;
+          if (temp->getX() == objectX && temp->getY() == objectY)
+          {
+              if (temp->getIsImpactable() == false) //if not impactable, == square
+              {
+                  //std::cerr << " on a square " << std::endl;
+                  return true;
+              }
+              //return true;
+          }
       }
-      else
-      {
-          m_yoshi->moveTo(playerX, playerY);
-      }
+      return false;
   }
   
 

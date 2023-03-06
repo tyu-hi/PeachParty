@@ -7,7 +7,7 @@
 //Actor
 Actor::Actor(StudentWorld* world, const int imageID, int startX, int startY, int startDirection, int depth, double size)
     : GraphObject(imageID, startX, startY, startDirection, depth, 1), m_dieRoll(0), ticks_to_move(0), waiting_to_roll(true)
-        , m_alive(true), m_playerCoins(0), m_playerStars(0), m_goTeleport(false), justSwapped(false) //, ticks_to_move(ticks)
+        , m_alive(true), m_playerCoins(0), m_playerStars(0), m_goTeleport(false), justSwapped(false), movingDirection(right) //, ticks_to_move(ticks)
 {
     m_world = world;
     isPeachOnSquare = false;
@@ -39,6 +39,38 @@ bool Actor::isValidPos(int dir) //, int xDir, int yDir)
         return true;
     }
 
+}
+bool Actor::atAFork()
+{
+    int numOfDirections = 0;
+    if (isValidPos(right) == true)
+    {
+        numOfDirections++;
+        //std::cerr << "checking right " << std::endl;
+    }
+    if (isValidPos(left) == true)
+    {
+        numOfDirections++;
+        //std::cerr << "checking left " << std::endl;
+    }
+    if (isValidPos(up) == true)
+    {
+        numOfDirections++;
+        //std::cerr << "checking up " << std::endl;
+    }
+    if (isValidPos(down) == true)
+    {
+        numOfDirections++;
+        //std::cerr << "checking down " << std::endl;
+    }
+    if (numOfDirections >= 3)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 void Actor::swap()
 {
@@ -93,16 +125,14 @@ void Actor::swap()
 void Actor::swapStars()
 {
     //swap stars
-    int tempStars = 0;
-    tempStars = getWorld()->getPlayerStars(1);
+    int tempStars = getWorld()->getPlayerStars(1);
     getWorld()->setPlayerStars(1, getWorld()->getPlayerStars(2));
     getWorld()->setPlayerStars(2, tempStars);
 }
 void Actor::swapCoins()
 {
     //swap coins
-    int tempCoins = 0;
-    tempCoins = getWorld()->getPlayerCoins(1);
+    int tempCoins = getWorld()->getPlayerCoins(1);
     getWorld()->setPlayerCoins(1, getWorld()->getPlayerCoins(2));
     getWorld()->setPlayerCoins(2, tempCoins);
 }
@@ -122,11 +152,19 @@ bool Actor::getYoshiOn()
 {
     return isYoshiOnSquare;
 }
+int Actor::getMovingDirection()
+{
+    return movingDirection;
+}
+void Actor::setMovingDirection(int dir)
+{
+    movingDirection = dir;
+}
 
-Players::Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks) 
+Players::Players(StudentWorld* world, const int imageID, int startX, int startY, int ticks)
 //, int startDirection, int depth, double size)
     : Actor(world, imageID, startX, startY)// startDirection, depth, size),
-    , /*ticks_to_move(ticks)*/ movingDirection(right) //, m_vortex(nullptr)
+    /*ticks_to_move(ticks)*/ /*movingDirection(right)*/ //, m_vortex(nullptr)
 {
     //ticks_to_move = 0;
     //waiting_to_roll = true;
@@ -134,15 +172,10 @@ Players::Players(StudentWorld* world, const int imageID, int startX, int startY,
     //m_dieRoll = 0;
     //movingDirection = right;
 }
-int Players::getMovingDirection()
+bool Players::getIsImpactable()
 {
-    return movingDirection;
+    return false;
 }
-void Players::setMovingDirection(int dir)
-{
-    movingDirection = dir;
-}
-
 //void Players::setVortex(Vortex* vortex)
 //{
 //    //m_vortex = vortex;
@@ -293,31 +326,9 @@ void Peach::doSomething()
             if (isOnDirectionalSquare() == false)
             {
                 //std::cerr << "checking for fork " << std::endl;
-                int numOfDirections = 0;
-                if (isValidPos(right) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking right " << std::endl;
-                }
-                if (isValidPos(left) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking left " << std::endl;
-                }
-                if (isValidPos(up) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking up " << std::endl;
-                }
-                if (isValidPos(down) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking down " << std::endl;
-                }
-                if (numOfDirections >= 3)
+                if (atAFork() == true)
                 {
                     int PeachAction = getWorld()->getAction(1);
-                    int YoshiAction = getWorld()->getAction(2);
 
                     switch (PeachAction)
                     {
@@ -427,28 +438,30 @@ void Yoshi::doSomething()
             if (isOnDirectionalSquare() == false)
             {
                 //std::cerr << "checking for fork " << std::endl;
-                int numOfDirections = 0;
-                if (isValidPos(right) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking right " << std::endl;
-                }
-                if (isValidPos(left) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking left " << std::endl;
-                }
-                if (isValidPos(up) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking up " << std::endl;
-                }
-                if (isValidPos(down) == true)
-                {
-                    numOfDirections++;
-                    //std::cerr << "checking down " << std::endl;
-                }
-                if (numOfDirections >= 3)
+                //int numOfDirections = 0;
+                //if (isValidPos(right) == true)
+                //{
+                //    numOfDirections++;
+                //    //std::cerr << "checking right " << std::endl;
+                //}
+                //if (isValidPos(left) == true)
+                //{
+                //    numOfDirections++;
+                //    //std::cerr << "checking left " << std::endl;
+                //}
+                //if (isValidPos(up) == true)
+                //{
+                //    numOfDirections++;
+                //    //std::cerr << "checking up " << std::endl;
+                //}
+                //if (isValidPos(down) == true)
+                //{
+                //    numOfDirections++;
+                //    //std::cerr << "checking down " << std::endl;
+                //}
+                //if (numOfDirections >= 3)
+                //{
+                if (atAFork() == true)
                 {
                     int YoshiAction = getWorld()->getAction(2);
 
@@ -1082,10 +1095,138 @@ void DroppingSquares::doSomething()
         }
     }
 }
-Baddie::Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance, bool walkingState)
-    :Actor(world, imageID, startX, startY)
+Baddie::Baddie(StudentWorld* world, const int imageID, int startX, int startY, int travelDistance)
+    :Actor(world, imageID, startX, startY), walkingState(false), pauseCounter(180) //, squares_to_move(0)
 {
 
+}
+void Baddie::doSomething()
+{
+    //2. If enemy is in walking state
+    if (getWalkingState() == true)
+    {
+        if (atAFork() == true && getWorld()->isOnASquare(getX(), getY()) == true)
+        {
+            int randomDirection = randInt(1, 4);
+            if (randomDirection == 1)
+            {
+                if (isValidPos(up) == true)
+                {
+                    setMovingDirection(up);
+                    setDirection(right);
+                }
+            }
+            else if (randomDirection == 2)
+            {
+                if (isValidPos(right) == true)
+                {
+
+                    setMovingDirection(right);
+                    setDirection(right);
+                }
+            }
+            else if (randomDirection == 3)
+            {
+                if (isValidPos(down) == true)
+                {
+                    setMovingDirection(down);
+                    setDirection(right);
+                }
+            }
+            else
+            {
+                if (isValidPos(left) == true)
+                {
+                    setMovingDirection(left);
+                    setDirection(left);
+                }
+            }
+        }
+        //else if ()
+        else if (getWorld()->isOnASquare(getX(), getY()) == true && isValidPos(getMovingDirection()) == false)
+        {
+            //std::cerr << "on square! " << std::endl;
+            //C. if avatar can't coitinue moving in current direction
+            //update avatar's walk direction so it can turn to face a new direction perpendicular to walking direction.
+                    //do: a is valid position function, in actor class, or do a is valid position in student world only
+                    //check if position is empty using studentworld's getContentsOF
+                    //only studentworld has access to board, so is empty should be in that
+            //getX() provides pixels, so divide by 16 to get grid space!
+
+            //every tick you move 2 pixels, so 8 ticks you move 16 pixels, which is one square
+            //each block is 16 pixels by 16 pixels
+            if (getTicks() % 8 == 0)
+                //if (getX() % 16 == 0 && getY() % 16 == 0)
+            {
+                //int gridX = getX() / SPRITE_WIDTH;
+                //int gridY = getY() / SPRITE_HEIGHT;
+                setDieRoll(0);
+                if (getMovingDirection() == right || getMovingDirection() == left)
+                {
+                    if (isValidPos(getMovingDirection()) == false)
+                    {
+                        //std::cerr << "Enter checking dir for up and down!" << std::endl;
+                        //std::cerr << gridX << " " << gridY << std::endl;
+
+                        //code for preferred setDirection()
+                        if (isValidPos(down) == true && isValidPos(up) == true)
+                        {
+                            //std::cerr << "change dir up!" << std::endl;
+                            setMovingDirection(up);
+                            setDirection(right);	//changes sprite direction
+                        }
+                        else if (isValidPos(up) == true)
+                        {
+                            //std::cerr << "change dir!" << std::endl;
+                            setMovingDirection(up);
+                            setDirection(right);
+                        }
+                        else if (isValidPos(down) == true)
+                        {
+                            //std::cerr << "change dir!" << std::endl;
+                            setMovingDirection(down);
+                            setDirection(right);
+                        }
+                    }
+                }
+                //if going up or down
+                else if (getMovingDirection() == up || getMovingDirection() == down)
+                {
+                    if (isValidPos(getMovingDirection()) == false)
+                    {
+                        //std::cerr << "Enter checking dir for right and left!" << std::endl;
+                        //std::cerr << gridX << " " << gridY << std::endl;
+
+                        //code for preferred setDirection()
+                        if (isValidPos(right) == true && isValidPos(left) == true)
+                        {
+                            //std::cerr << "change dir!" << std::endl;
+                            setMovingDirection(right);
+                            setDirection(right);
+                        }
+                        else if (isValidPos(right) == true)
+                        {
+                            //std::cerr << "change dir!" << std::endl;
+                            setMovingDirection(right);
+                            setDirection(right);
+                        }
+                        else if (isValidPos(left) == true)
+                        {
+                            //std::cerr << "change dir!" << std::endl;
+                            setMovingDirection(left);
+                            setDirection(left);
+                        }
+                    }
+                }
+            }
+        }
+
+        //Still in walking state:
+        //moving in 2 pixels in direction
+        moveAtAngle(getMovingDirection(), 2);
+        //decrementing ticks, each iteration
+        setTicks(0);
+    }
 }
 bool Baddie::getWalkingState()
 {
@@ -1095,32 +1236,208 @@ void Baddie::setWalkingState(bool state)
 {
     walkingState = state;
 }
+void Baddie::doBaddieStuff(int enemyNum)
+{
+    int randomAction = randInt(1, 2);   //50% chance of doing something when landed on
+    //int randomAction = 1;
+    if (getWalkingState() == false) //AKA in pause state
+    {
+        //std::cerr << "bowser " << std::endl;
+        if (isOverLapping(this, getWorld()->getPeach()) && getWorld()->getPeach()->getWaitingToRoll() == true)
+        {
+            if (!getPeachOn())
+            {
+                if (randomAction == 1 && enemyNum == 1)
+                {
+                    //std::cerr << "random action: " << randomAction << std::endl;
+                    //reset coins
+                    //std::cerr << "on bowser " << std::endl;
+                    //not reseting coins?
+                    getWorld()->getPeach()->setCoins(0);
+                    getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+                }
+                else if (randomAction == 1 && enemyNum == 2)
+                {
+                    int booRandomAction = randInt(1, 2);
+                    if (booRandomAction == 1)
+                    {
+                        swapCoins();
+                        getWorld()->playSound(SOUND_BOO_ACTIVATE);
+                    }
+                    else
+                    {
+                        swapStars();
+                        getWorld()->playSound(SOUND_BOO_ACTIVATE);
+                    }
+                }
+            }
+            setPeachOn(true);
+        }
+        else
+        {
+            setPeachOn(false);
+        }
+
+        if (isOverLapping(this, getWorld()->getYoshi()) && getWorld()->getYoshi()->getWaitingToRoll() == true)
+        {
+            if (!getYoshiOn())
+            {
+                if (randomAction == 1 && enemyNum == 1)
+                {
+                    getWorld()->getYoshi()->setCoins(0);
+                    getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+                }
+                else if (randomAction == 1 && enemyNum == 2)
+                {
+                    int booRandomAction = randInt(1, 2);
+                    if (booRandomAction == 1)
+                    {
+                        swapCoins();
+                        getWorld()->playSound(SOUND_BOO_ACTIVATE);
+                    }
+                    else
+                    {
+                        swapStars();
+                        getWorld()->playSound(SOUND_BOO_ACTIVATE);
+                    }
+                }
+            }
+            setYoshiOn(true);
+        }
+        else
+        {
+            setYoshiOn(false);
+        }
+
+        //1. b Decrement pause counter
+        setPauseCounter(0);
+        //std::cerr << "pause counter: " << getPauseCounter() << std::endl;
+        /*if (getPauseCounter() <= 0)
+        {
+            if (enemyNum == 1)
+            {
+                std::cerr << "setting walking to false" << std::endl;
+
+                int squares_to_move = randInt(1, 10);
+                setTicks(squares_to_move);
+                setWalkingState(true);
+            }
+            else if (enemyNum == 2)
+            {
+                int squares_to_move = randInt(1, 3);
+                setTicks(squares_to_move);
+                setWalkingState(true);
+            }
+        }*/
+    }
+}
 
 Bowser::Bowser(StudentWorld* world, int startX, int startY)
     :Baddie(world, IID_BOWSER, startX, startY)
+{   }
+void Bowser::doSomething()
 {
-    int randomAction = randInt(1, 2);
-    if (getWalkingState() == false)
+    //1. If bowser is in paused state
+    
+    //int randomAction = randInt(1, 2);   //50% chance of doing something when landed on
+    //int randomAction = 1;
+    //if (getWalkingState() == false) //AKA in pause state
+    //{
+    //    //std::cerr << "bowser " << std::endl;
+    //    if (isOverLapping(this, getWorld()->getPeach()) && getWorld()->getPeach()->getWaitingToRoll() == true)
+    //    {
+    //        if (!getPeachOn())
+    //        {
+    //            if (randomAction == 1)
+    //            {
+    //                //reset coins
+    //                std::cerr << "on bowser " << std::endl;
+    //                //not reseting coins?
+    //                getWorld()->getPeach()->setCoins(0);
+    //                getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+    //            }
+    //        }
+    //        setPeachOn(true);
+    //    }
+    //    else
+    //    {
+    //        setPeachOn(false);
+    //    }
+    //    if (isOverLapping(this, getWorld()->getYoshi()) && getWorld()->getPeach()->getWaitingToRoll() == true)
+    //    {
+    //        if (!getYoshiOn())
+    //        {
+    //            if (randomAction == 1)
+    //            {
+    //                getWorld()->getYoshi()->setCoins(0);
+    //                getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+    //            }
+    //        }
+    //        setYoshiOn(true);
+    //    }
+    //    else
+    //    {
+    //        setYoshiOn(false);
+    //    }
+    //    //1. b Decrement pause counter
+    //    setPauseCounter(0);
+    //    std::cerr << "pause counter: " << getPauseCounter() << std::endl;
+    //    if (getPauseCounter() <= 0)
+    //    {
+    //        int squares_to_move = randInt(1, 10);
+    //        setTicks(squares_to_move);
+    //        setWalkingState(true);
+    //    }
+    //}
+
+    Baddie::doBaddieStuff(1);
+    if (getPauseCounter() <= 0 && getWalkingState() == false)
     {
-        if (isOverLapping(this, getWorld()->getPeach()))
+        //std::cerr << "setting walking to false" << std::endl;
+        int squares_to_move = randInt(1, 10);
+        setTicks(squares_to_move);
+        setWalkingState(true);
+
+    }
+
+    //2. if bowser is in walking state
+    Baddie::doSomething();
+    if (getTicks() <= 0 && getWalkingState() == true)
+    {
+        setWalkingState(false);
+        setPauseCounter(180);
+        //std::cerr << "in ticks" << std::endl;
+        int randomChance = randInt(1, 4);  //25% chance to drop dropping square
+        if (randomChance == 1)
         {
-            if (randomAction == 1)
-            {
-                //reset coins
-                getWorld()->getPeach()->setCoins(0);
-                getWorld()->playSound(SOUND_BOO_ACTIVATE);
-            }
+            //remove coin below him, and insert new dropping square
+            //getWorld()->playSound(SOUND_DROPPING_SQUARE_ACTIVATE);
         }
     }
+        
 }
 Boo::Boo(StudentWorld* world, int startX, int startY)
     :Baddie(world, IID_BOO, startX, startY)
+{   }
+void Boo::doSomething()
 {
+    //1. if boo is in pasued state
+    Baddie::doBaddieStuff(2);
+    if (getPauseCounter() <= 0 && getWalkingState() == false)
+    {
+         //std::cerr << "in pause coutner" << std::endl;
+         int squares_to_move = randInt(1, 3);
+         setTicks(squares_to_move);
+         setWalkingState(true);
+    }
 
-}
-void Bowser::doSomething()
-{
-    //if (getWorld()->getPeach()->)
+    //2. if boo is in walking state
+    Baddie::doSomething();
+    if (getTicks() <= 0 && getWalkingState() == true)
+    {
+        setWalkingState(false);
+        setPauseCounter(180);
+    }
 }
 
 Vortex::Vortex(StudentWorld* world, int startX, int startY)
